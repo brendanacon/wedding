@@ -122,7 +122,7 @@ function Hero({ variant }) {
           background: 'linear-gradient(180deg, oklch(0.22 0.015 50 / 0) 0%, oklch(0.22 0.015 50 / 0.15) 50%, oklch(0.22 0.015 50 / 0.65) 100%)',
           zIndex: 1,
         }} />
-        <div style={{ position: 'relative', zIndex: 2, color: 'var(--cream)', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+        <div className="hero-copy" style={{ position: 'relative', zIndex: 2, color: 'var(--cream)', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
           <div className="script" style={{ fontSize: 'clamp(36px, 5vw, 58px)', marginBottom: 4, opacity: 0.95 }}>
             The wedding of
           </div>
