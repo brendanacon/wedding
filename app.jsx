@@ -387,7 +387,7 @@ function Day() {
               {[
                 ['3:00', 'Pre-ceremony', 'Arrive, enjoy a drink &amp; some live music, then find your seat'],
                 ['3:30', 'Ceremony', 'A strict start, so please be seated in good time'],
-                ['4:15', 'Canapé hour', 'Drinks &amp; canapés on the terrace'],
+                ['4:15', 'Canapé hour', 'Drinks &amp; canapés on the terraces'],
                 ['5:30', 'Reception', 'Dinner, speeches &amp; dancing'],
                 ['11:00', 'Event finish', ''],
               ].map(([time, title, sub], i, arr) => (
@@ -719,7 +719,7 @@ function FAQ() {
     ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
     ['Is there parking?', 'Yes. Free, on-site, and plenty of it.'],
     ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies, intolerances, and preferences. The kitchen is excellent and very accommodating.'],
-    ['Gifts?', 'Your presence is the real gift. There\'ll be a wishing well on the night for anyone who\'d like to contribute.'],
+    ['Do you have a gift registry?', 'We don\'t have a gift registry — we have all we need. If you\'d like to give us something, there will be a wishing well on the night.'],
   ];
   return (
     <section id="faq" style={{
