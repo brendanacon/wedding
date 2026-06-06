@@ -668,6 +668,7 @@ function RSVP() {
   const [attending, setAttending] = useState(null);
   const [guests, setGuests] = useState([]);
   const [bus, setBus] = useState(null);
+  const [breakfast, setBreakfast] = useState(null);
   const [diet, setDiet] = useState('');
   const [song, setSong] = useState('');
   const [message, setMessage] = useState('');
@@ -680,7 +681,7 @@ function RSVP() {
 
   const reset = () => {
     setStep(0); setName(''); setAttending(null);
-    setGuests([]); setBus(null); setDiet(''); setSong(''); setMessage('');
+    setGuests([]); setBus(null); setBreakfast(null); setDiet(''); setSong(''); setMessage('');
     setSubmitError('');
   };
 
@@ -700,6 +701,7 @@ function RSVP() {
           attending: attending ? 'Yes' : 'No',
           guests: guests.filter(Boolean).join(', '),
           bus: attending === true ? (bus === true ? 'Yes' : bus === false ? 'No' : '') : 'N/A',
+          breakfast: attending === true ? (breakfast === true ? 'Yes' : breakfast === false ? 'No' : '') : 'N/A',
           dietary: diet || '',
           song: song || '',
           message: message || '',
@@ -848,6 +850,13 @@ function RSVP() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <Toggle active={bus === true} onClick={() => setBus(true)}>Yes please</Toggle>
                     <Toggle active={bus === false} onClick={() => setBus(false)}>We'll make our own way</Toggle>
+                  </div>
+                </Field>
+
+                <Field label="Join us for breakfast the next morning?" hint="A relaxed breakfast with coffee the morning after, from 8:30 to 10:30. No need to dress up — just come as you are before you head off.">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <Toggle active={breakfast === true} onClick={() => setBreakfast(true)}>We'll be there</Toggle>
+                    <Toggle active={breakfast === false} onClick={() => setBreakfast(false)}>Not this time</Toggle>
                   </div>
                 </Field>
 
