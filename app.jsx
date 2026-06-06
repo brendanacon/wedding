@@ -80,7 +80,7 @@ function Nav() {
         fontSize: 14, textDecoration: 'none', color: 'var(--ink)',
         letterSpacing: '0.18em', whiteSpace: 'nowrap',
       }}>
-        E <span style={{ fontFamily: 'Dancing Script, cursive', textTransform: 'none', fontSize: 20, fontWeight: 600, letterSpacing: 0 }}>&</span> B
+        E <span style={{ fontFamily: 'Mrs Saint Delafield, cursive', textTransform: 'none', fontSize: 20, fontWeight: 600, letterSpacing: 0 }}>&</span> B
       </a>
       <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
         {items.map(([id, label]) => (
@@ -879,7 +879,7 @@ function RSVP() {
                 width: '100%', maxWidth: 420, padding: '16px 20px',
                 background: 'transparent', color: 'var(--cream)',
                 border: 'none', borderBottom: '1px solid oklch(0.78 0.02 70)',
-                fontSize: 24, fontFamily: 'Cormorant Garamond, serif',
+                fontSize: 24, fontFamily: 'Bellefair, serif',
                 fontStyle: 'italic', textAlign: 'center', outline: 'none',
               }}
             />
@@ -933,7 +933,7 @@ function RSVP() {
                           style={{
                             padding: '0 18px', background: 'transparent', color: 'var(--cream)',
                             border: '1px solid oklch(0.55 0.03 50)', cursor: 'pointer',
-                            fontSize: 18, lineHeight: 1, fontFamily: 'Cormorant Garamond, serif',
+                            fontSize: 18, lineHeight: 1, fontFamily: 'Bellefair, serif',
                           }}>
                           ×
                         </button>
@@ -1063,7 +1063,7 @@ const darkInput = {
   width: '100%', padding: '14px 18px',
   background: 'transparent', color: 'var(--cream)',
   border: '1px solid oklch(0.55 0.03 50)',
-  fontSize: 15, fontFamily: 'Inter, sans-serif', outline: 'none',
+  fontSize: 15, fontFamily: 'Jost, sans-serif', outline: 'none',
 };
 
 function Field({ label, hint, children }) {
@@ -1091,7 +1091,7 @@ function Toggle({ active, onClick, children }) {
       border: `1px solid ${active ? 'var(--camel)' : 'oklch(0.55 0.03 50)'}`,
       cursor: 'pointer',
       fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase',
-      transition: 'all 0.2s', fontFamily: 'Inter, sans-serif',
+      transition: 'all 0.2s', fontFamily: 'Jost, sans-serif',
     }}>
       {children}
     </button>
