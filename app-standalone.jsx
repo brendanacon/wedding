@@ -245,7 +245,7 @@ function Story() {
           </figure>
           <div style={{ padding: '0 20px' }}>
             <p className="serif" style={{
-              fontSize: 30, fontStyle: 'italic', color: 'var(--camel)', marginBottom: 20, lineHeight: 1.3,
+              fontSize: 22, fontStyle: 'italic', color: 'var(--ink)', marginBottom: 20, lineHeight: 1.5,
             }}>
               Let's catch the sunrise.
             </p>
@@ -331,8 +331,8 @@ function Story() {
             fontSize: 22, fontStyle: 'italic', color: 'var(--ink)',
             lineHeight: 1.5, marginBottom: 16,
           }}>
-            From a lake in Japan to a hill in the Hunter, we can't wait to
-            have you there for the next part.
+            From a lake in Japan to a hill in the Hunter,{' '}
+            <br />we can't wait to have you there for the next part.
           </p>
           <div className="script" style={{ fontSize: 38, color: 'var(--camel)', marginTop: 20 }}>
             Erika &amp; Brendan
@@ -707,7 +707,7 @@ function RSVP() {
             fontWeight: 400, letterSpacing: '0.06em',
             marginBottom: 20,
           }}>
-            Will you join us?
+            Will you<br />join us?
           </h2>
           <p className="serif" style={{
             fontSize: 18, fontStyle: 'italic', color: 'oklch(0.78 0.02 70)',

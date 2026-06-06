@@ -246,7 +246,7 @@ function Story() {
           </figure>
           <div style={{ padding: '0 20px' }}>
             <p className="serif" style={{
-              fontSize: 30, fontStyle: 'italic', color: 'var(--camel)', marginBottom: 20, lineHeight: 1.3,
+              fontSize: 22, fontStyle: 'italic', color: 'var(--ink)', marginBottom: 20, lineHeight: 1.5,
             }}>
               Let's catch the sunrise.
             </p>
@@ -332,8 +332,8 @@ function Story() {
             fontSize: 22, fontStyle: 'italic', color: 'var(--ink)',
             lineHeight: 1.5, marginBottom: 16,
           }}>
-            From a lake in Japan to a hill in the Hunter —
-            we can't wait to have you there for the next part.
+            From a lake in Japan to a hill in the Hunter,{' '}
+            <br />we can't wait to have you there for the next part.
           </p>
           <div className="script" style={{ fontSize: 38, color: 'var(--camel)', marginTop: 20 }}>
             Erika &amp; Brendan
@@ -483,13 +483,17 @@ function Row({ k, v }) {
 // ATTIRE — dress code + colour palette
 // ──────────────────────────────────────────────────────────
 function Attire() {
-  // Placeholder palette — swap these out for the real colours later.
   const palette = [
     { name: 'Sage', hex: '#9CAF88' },
     { name: 'Terracotta', hex: '#C56C49' },
     { name: 'Dusty Blue', hex: '#7E97A8' },
     { name: 'Camel', hex: '#C19A6B' },
     { name: 'Olive', hex: '#7C7A4A' },
+  ];
+  const darkPalette = [
+    { name: 'Navy', hex: '#1C3058' },
+    { name: 'Charcoal', hex: '#4A4A4A' },
+    { name: 'Black', hex: '#1A1A1A' },
   ];
 
   const cardStyle = {
@@ -536,10 +540,27 @@ function Attire() {
         {/* Colour palette */}
         <div style={{ marginTop: 64, textAlign: 'center' }}>
           <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', marginBottom: 22 }}>
-            A few shades we love — but not the only ones
+            A few shades we love
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 28 }}>
             {palette.map((c) => (
+              <div key={c.name} style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: 64, height: 64, borderRadius: '50%',
+                  background: c.hex, margin: '0 auto 12px',
+                  border: '1px solid oklch(0.55 0.03 50)',
+                }} />
+                <div className="mono" style={{ fontSize: 9, color: 'oklch(0.82 0.02 70)' }}>
+                  {c.name}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', margin: '36px 0 22px' }}>
+            Classic base colours
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 28 }}>
+            {darkPalette.map((c) => (
               <div key={c.name} style={{ textAlign: 'center' }}>
                 <div style={{
                   width: 64, height: 64, borderRadius: '50%',
@@ -857,7 +878,7 @@ function RSVP() {
             fontWeight: 400, letterSpacing: '0.06em',
             marginBottom: 20,
           }}>
-            Will you join us?
+            Will you<br />join us?
           </h2>
           <p className="serif" style={{
             fontSize: 18, fontStyle: 'italic', color: 'oklch(0.78 0.02 70)',
