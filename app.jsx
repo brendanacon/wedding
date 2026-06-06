@@ -80,7 +80,7 @@ function Nav() {
         fontSize: 14, textDecoration: 'none', color: 'var(--ink)',
         letterSpacing: '0.18em', whiteSpace: 'nowrap',
       }}>
-        E <span style={{ fontFamily: 'Mrs Saint Delafield, cursive', textTransform: 'none', fontSize: 20, fontWeight: 600, letterSpacing: 0 }}>&</span> B
+        E <span style={{ fontFamily: 'Dancing Script, cursive', textTransform: 'none', fontSize: 20, fontWeight: 600, letterSpacing: 0 }}>&</span> B
       </a>
       <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
         {items.map(([id, label]) => (
@@ -332,8 +332,8 @@ function Story() {
             fontSize: 22, fontStyle: 'italic', color: 'var(--ink)',
             lineHeight: 1.5, marginBottom: 16,
           }}>
-            From a lake in Japan to a hill in the Hunter, we can't wait to
-            have you there for the next part.
+            From a lake in Japan to a hill in the Hunter —
+            we can't wait to have you there for the next part.
           </p>
           <div className="script" style={{ fontSize: 38, color: 'var(--camel)', marginTop: 20 }}>
             Erika &amp; Brendan
@@ -430,10 +430,11 @@ function Day() {
                 Adam's Peak Country Estate
               </h3>
               <p style={{ fontSize: 14, color: 'var(--ink-soft)', lineHeight: 1.85, marginBottom: 28 }}>
-                A working vineyard and private estate tucked into the rolling hills
-                of the Hunter Valley, with sandstone buildings, ancient gums, and
-                sweeping views across the Brokenback Range. We're keeping the rest
-                a surprise until you arrive.
+                A 100-acre country estate in Broke, set against sweeping views of the
+                Yellow Rock Escarpment and the Brokenback Ranges. The Barn, The Hay Shed,
+                and the grounds — including a century-old Iron Bark tree — make it one
+                of the Hunter Valley's most beautiful private settings. We're keeping
+                the rest a surprise until you arrive.
               </p>
 
               <hr className="hairline" style={{ margin: '24px 0' }} />
