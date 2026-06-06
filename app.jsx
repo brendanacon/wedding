@@ -689,14 +689,27 @@ function RSVP() {
     setSubmitting(true);
     setSubmitError('');
     try {
-      const res = await fetch('/api/rsvp', {
+      const res = await fetch('https://formspree.io/f/xpqeqyjj', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, attending, guests, bus, diet, song, message }),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          attending: attending ? 'Yes' : 'No',
+          guests: guests.filter(Boolean).join(', '),
+          bus: attending === true ? (bus === true ? 'Yes' : bus === false ? 'No' : '') : 'N/A',
+          dietary: diet || '',
+          song: song || '',
+          message: message || '',
+          _subject: `Wedding RSVP — ${name}`,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Something went wrong. Please try again.');
+        const msg = data.errors?.map((er) => er.message).join(', ');
+        throw new Error(msg || 'Something went wrong. Please try again.');
       }
       setStep(2);
     } catch (err) {
