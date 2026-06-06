@@ -1038,17 +1038,6 @@ function RSVP() {
                 ? `We can't wait to celebrate with you, ${name.split(' ')[0]}.`
                 : `Thanks for letting us know, ${name.split(' ')[0]}. You'll be missed.`}
             </p>
-            <p style={{ fontSize: 14, color: 'oklch(0.78 0.02 70)', marginBottom: 44, maxWidth: 420, margin: '0 auto 44px', lineHeight: 1.7 }}>
-              If anything changes, you can reply again anytime.
-            </p>
-            <button onClick={reset} style={{
-              padding: '14px 32px',
-              background: 'transparent', color: 'var(--cream)',
-              border: '1px solid oklch(0.78 0.02 70)', cursor: 'pointer',
-              fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase',
-            }}>
-              Edit reply
-            </button>
           </div>
         )}
       </div>
