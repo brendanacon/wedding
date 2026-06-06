@@ -596,7 +596,7 @@ function Stay() {
 // FAQ
 // ──────────────────────────────────────────────────────────
 function FAQ() {
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState(-1);
   const items = [
     ['What should I wear?', 'Semi-formal attire. For the women, dresses below the knee. It\'s an outdoor, barn-style reception on grass, so consider your heels. For the men, a blazer and shirt.'],
     ['Can I bring a plus one?', 'If your invitation includes a plus one, it will say so explicitly. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
