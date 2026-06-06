@@ -245,11 +245,11 @@ function Story() {
             }} className="grain" />
           </figure>
           <div style={{ padding: '0 20px' }}>
-            <div className="script" style={{
-              fontSize: 42, color: 'var(--camel)', marginBottom: 20, lineHeight: 1,
+            <p className="serif" style={{
+              fontSize: 30, fontStyle: 'italic', color: 'var(--camel)', marginBottom: 20, lineHeight: 1.3,
             }}>
               Let's catch the sunrise.
-            </div>
+            </p>
             <p style={{ fontSize: 15, color: 'var(--ink-soft)', lineHeight: 1.85, marginBottom: 16 }}>
               The trip had been a year in the planning. Neither of them
               said it out loud, but both had quietly marked this as the one, the trip
@@ -269,8 +269,8 @@ function Story() {
           marginTop: 120, alignItems: 'center',
         }}>
           <div style={{ padding: '0 20px' }}>
-            <p className="script" style={{
-              fontSize: 38, lineHeight: 1.2,
+            <p className="serif" style={{
+              fontSize: 24, fontStyle: 'italic', lineHeight: 1.5,
               color: 'var(--ink)', marginBottom: 20,
             }}>
               And it so nearly was just the two of them.
@@ -536,7 +536,7 @@ function Attire() {
         {/* Colour palette */}
         <div style={{ marginTop: 64, textAlign: 'center' }}>
           <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', marginBottom: 22 }}>
-            A few shades we love
+            A few shades we love — but not the only ones
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 28 }}>
             {palette.map((c) => (
@@ -568,8 +568,9 @@ function Attire() {
           <div style={cardStyle}>
             <div className="serif" style={headingStyle}>For the men</div>
             <p style={bodyStyle}>
-              We'd love to see a suit, or a blazer and trousers. Please leave the
-              jeans, chinos and sneakers behind.
+              A suit or blazer and trousers — navy, charcoal, black, or anything
+              in between all work perfectly. If you'd like to pick up a colour from
+              the palette, even better. Please leave jeans, chinos and sneakers behind.
             </p>
           </div>
         </div>

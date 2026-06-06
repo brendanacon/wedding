@@ -244,11 +244,11 @@ function Story() {
             }} className="grain" />
           </figure>
           <div style={{ padding: '0 20px' }}>
-            <div className="script" style={{
-              fontSize: 42, color: 'var(--camel)', marginBottom: 20, lineHeight: 1,
+            <p className="serif" style={{
+              fontSize: 30, fontStyle: 'italic', color: 'var(--camel)', marginBottom: 20, lineHeight: 1.3,
             }}>
               Let's catch the sunrise.
-            </div>
+            </p>
             <p style={{ fontSize: 15, color: 'var(--ink-soft)', lineHeight: 1.85, marginBottom: 16 }}>
               The trip had been a year in the planning. Neither Erika or Brendan
               said it out loud, but both had quietly marked this as the one, the trip
@@ -268,8 +268,8 @@ function Story() {
           marginTop: 120, alignItems: 'center',
         }}>
           <div style={{ padding: '0 20px' }}>
-            <p className="script" style={{
-              fontSize: 38, lineHeight: 1.2,
+            <p className="serif" style={{
+              fontSize: 24, fontStyle: 'italic', lineHeight: 1.5,
               color: 'var(--ink)', marginBottom: 20,
             }}>
               And it so nearly was just the two of them.
@@ -439,7 +439,7 @@ function Day() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <Row k="Where" v="Hunter Valley, NSW" />
-                <Row k="Attire" v="Semi-formal. Blazer and shirt for the men; dresses below the knee for the women." />
+                <Row k="Attire" v="Semi-formal. For the men, a suit or blazer and trousers in any colour — navy, charcoal and black all work perfectly. For the women, dresses below the knee." />
                 <Row k="Weather" v="Early autumn. Warm days, cool evenings, so bring a wrap." />
                 <Row k="Getting there" v="On-site parking, or hop on our free bus (stay in Pokolbin or Broke to use it). Details closer to the day." />
                 <Row k="Kids" v="Little ones are welcome. Just have a chat with us first." />
@@ -598,7 +598,7 @@ function Stay() {
 function FAQ() {
   const [open, setOpen] = useState(0);
   const items = [
-    ['What should I wear?', 'Semi-formal attire. For the women, dresses below the knee. It\'s an outdoor, barn-style reception on grass, so consider your heels. For the men, a blazer and shirt.'],
+    ['What should I wear?', 'Semi-formal attire. For the men, a suit or blazer and trousers — navy, charcoal and black all work perfectly. For the women, dresses below the knee. It\'s an outdoor, barn-style reception on grass, so consider your heels.'],
     ['Can I bring a plus one?', 'If your invitation includes a plus one, it will say so explicitly. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
     ['Are kids invited?', 'Little ones are welcome. Just have a chat with us first so we can plan properly.'],
     ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding. To use it, please make sure you\'re staying in the Pokolbin or Broke area so we can get everyone to and from the event on time. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
