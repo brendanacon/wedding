@@ -268,8 +268,8 @@ function Story() {
           marginTop: 120, alignItems: 'center',
         }}>
           <div style={{ padding: '0 20px' }}>
-            <p className="serif" style={{
-              fontSize: 24, fontStyle: 'italic', lineHeight: 1.5,
+            <p className="script" style={{
+              fontSize: 38, lineHeight: 1.2,
               color: 'var(--ink)', marginBottom: 20,
             }}>
               And it so nearly was just the two of them.
