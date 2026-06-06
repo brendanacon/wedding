@@ -61,6 +61,7 @@ function Nav() {
   const items = [
     ['story', 'The Story'],
     ['day', 'The Day'],
+    ['attire', 'Attire'],
     ['stay', 'Stay'],
     ['faq', 'FAQ'],
     ['rsvp', 'RSVP'],
@@ -169,12 +170,12 @@ function Hero({ variant }) {
           lineHeight: 1,
           letterSpacing: '0.04em',
           color: 'var(--ink)',
-          marginBottom: 40,
+          marginBottom: 24,
         }}>
           Erika &amp; Brendan
         </h1>
 
-        <div style={{ margin: '0 auto 40px', color: 'var(--ink)', maxWidth: 720 }}>
+        <div style={{ margin: '0 auto 24px', color: 'var(--ink)', maxWidth: 720 }}>
           <LineArtCouple color="var(--ink)" width={720} />
         </div>
 
@@ -196,8 +197,8 @@ function Hero({ variant }) {
           Ceremony at 4pm
         </div>
 
-        <div style={{ marginTop: 70 }}>
-          <div style={{ width: 1, height: 40, background: 'var(--hairline)', margin: '0 auto' }} />
+        <div style={{ marginTop: 38 }}>
+          <div style={{ width: 1, height: 32, background: 'var(--hairline)', margin: '0 auto' }} />
         </div>
       </div>
     </section>
@@ -250,7 +251,7 @@ function Story() {
               Let's catch the sunrise.
             </div>
             <p style={{ fontSize: 15, color: 'var(--ink-soft)', lineHeight: 1.85, marginBottom: 16 }}>
-              The trip had been a year in the planning. Neither Erika or Brendan
+              The trip had been a year in the planning. Neither of them
               said it out loud, but both had quietly marked this as the one, the trip
               where it would finally happen. Japan did not disappoint: clear skies,
               the best week, and Mt&nbsp;Fuji showing itself that very morning.
@@ -276,14 +277,14 @@ function Story() {
             </p>
             <p style={{ fontSize: 15, color: 'var(--ink-soft)', lineHeight: 1.85 }}>
               In the half-light before dawn, they had the lookout entirely to
-              themselves. Then, as the sun came up, a lone local photographer
+              themselves. Then, as the sun came up, a local photographer
               arrived to capture the landscape, and Brendan quietly kicked himself
               for missing the perfect moment with the morning glow and no one else
               around.
             </p>
             <p style={{ fontSize: 15, color: 'var(--ink-soft)', lineHeight: 1.85, marginTop: 16 }}>
               As it turned out, the photographer was a blessing in disguise. Before
-              leaving, Yuji began taking photos of Erika and Brendan before anything
+              leaving, they began taking photos of the two of them before anything
               had unfolded, and Brendan seized the moment, so the whole thing was
               caught on camera, start to finish.
             </p>
@@ -438,10 +439,9 @@ function Day() {
               <hr className="hairline" style={{ margin: '24px 0' }} />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                <Row k="Where" v="Hunter Valley, NSW" />
-                <Row k="Attire" v="Semi-formal. Blazer and shirt for the men; dresses below the knee for the women." />
+                <Row k="Address" v="66 Adams Peak Rd, Broke NSW 2330" />
                 <Row k="Weather" v="Early autumn. Warm days, cool evenings, so bring a wrap." />
-                <Row k="Getting there" v="On-site parking, or hop on our free bus (stay in Pokolbin or Broke to use it). Details closer to the day." />
+                <Row k="Getting there" v="Hop on our free shuttle bus to and from the wedding for guests staying in Poko or Broke. There is also on-site parking. Details closer to the date." />
                 <Row k="Kids" v="Little ones are welcome. Just have a chat with us first." />
               </div>
             </div>
@@ -475,6 +475,122 @@ function Row({ k, v }) {
       <div className="mono" style={{ color: 'var(--ink-soft)', fontSize: 9, paddingTop: 4 }}>{k}</div>
       <div style={{ fontSize: 14, lineHeight: 1.55 }}>{v}</div>
     </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────
+// ATTIRE — dress code + colour palette
+// ──────────────────────────────────────────────────────────
+function Attire() {
+  // Placeholder palette — swap these out for the real colours later.
+  const palette = [
+    { name: 'Sage', hex: '#9CAF88' },
+    { name: 'Terracotta', hex: '#C56C49' },
+    { name: 'Dusty Blue', hex: '#7E97A8' },
+    { name: 'Camel', hex: '#C19A6B' },
+    { name: 'Olive', hex: '#7C7A4A' },
+  ];
+
+  const cardStyle = {
+    background: 'transparent',
+    border: '1px solid oklch(0.55 0.03 50)',
+    padding: 36,
+  };
+  const headingStyle = {
+    fontSize: 28, fontStyle: 'italic', color: 'oklch(0.72 0.10 55)',
+    marginBottom: 18,
+  };
+  const bodyStyle = {
+    fontSize: 15, color: 'oklch(0.86 0.015 80)', lineHeight: 1.85,
+  };
+
+  return (
+    <section id="attire" style={{
+      background: 'var(--ink)', color: 'var(--cream)',
+      padding: '130px 44px',
+    }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div className="script" style={{ color: 'oklch(0.72 0.10 55)', marginBottom: 12, fontSize: 28 }}>
+            what to wear
+          </div>
+          <h2 className="caps" style={{
+            fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 400, letterSpacing: '0.06em',
+          }}>
+            Attire
+          </h2>
+          <div style={{ width: 36, height: 1, background: 'oklch(0.72 0.10 55)', margin: '26px auto 0' }} />
+        </div>
+
+        <p className="serif" style={{
+          fontSize: 'clamp(20px, 2.4vw, 26px)', fontStyle: 'italic',
+          textAlign: 'center', maxWidth: 720, margin: '40px auto 0',
+          color: 'oklch(0.90 0.015 80)', lineHeight: 1.55,
+        }}>
+          We ask that you wear semi-formal attire. The wedding is on a country
+          estate, with an outdoor ceremony and a barn-style reception. Dress for
+          the setting — bring your sunglasses, and skip the stilettos.
+        </p>
+
+        {/* Colour palette */}
+        <div style={{ marginTop: 64, textAlign: 'center' }}>
+          <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', marginBottom: 22 }}>
+            A few shades we love
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 28 }}>
+            {palette.map((c) => (
+              <div key={c.name} style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: 64, height: 64, borderRadius: '50%',
+                  background: c.hex, margin: '0 auto 12px',
+                  border: '1px solid oklch(0.55 0.03 50)',
+                }} />
+                <div className="mono" style={{ fontSize: 9, color: 'oklch(0.82 0.02 70)' }}>
+                  {c.name}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* For her / For him */}
+        <div className="stack-md" style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 64,
+        }}>
+          <div style={cardStyle}>
+            <div className="serif" style={headingStyle}>For the women</div>
+            <p style={bodyStyle}>
+              We ask for dresses below the knee, with heels or elegant flats. We
+              love colour, so leave that black or white dress behind.
+            </p>
+          </div>
+          <div style={cardStyle}>
+            <div className="serif" style={headingStyle}>For the men</div>
+            <p style={bodyStyle}>
+              We'd love to see a suit, or a blazer and trousers. Please leave the
+              jeans, chinos and sneakers behind.
+            </p>
+          </div>
+        </div>
+
+        {/* Please leave behind */}
+        <div style={{
+          marginTop: 24, padding: 36, textAlign: 'center',
+          border: '1px dashed oklch(0.55 0.03 50)',
+        }}>
+          <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', marginBottom: 12 }}>
+            Please leave behind
+          </div>
+          <p className="serif" style={{
+            fontSize: 20, fontStyle: 'italic', color: 'oklch(0.90 0.015 80)',
+            maxWidth: 620, margin: '0 auto', lineHeight: 1.55,
+          }}>
+            Erika has an irrational distaste for cowboy hats and suit vests, so
+            please leave those at home!
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -598,10 +714,9 @@ function Stay() {
 function FAQ() {
   const [open, setOpen] = useState(-1);
   const items = [
-    ['What should I wear?', 'Semi-formal attire. For the women, dresses below the knee. It\'s an outdoor, barn-style reception on grass, so consider your heels. For the men, a blazer and shirt.'],
-    ['Can I bring a plus one?', 'If your invitation includes a plus one, it will say so explicitly. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
+    ['Can I bring a plus one?', 'You would have been told if you have a plus one. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
     ['Are kids invited?', 'Little ones are welcome. Just have a chat with us first so we can plan properly.'],
-    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding. To use it, please make sure you\'re staying in the Pokolbin or Broke area so we can get everyone to and from the event on time. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
+    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
     ['Is there parking?', 'Yes. Free, on-site, and plenty of it.'],
     ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies, intolerances, and preferences. The kitchen is excellent and very accommodating.'],
     ['Gifts?', 'Your presence is the real gift. There\'ll be a wishing well on the night for anyone who\'d like to contribute.'],
@@ -846,7 +961,7 @@ function RSVP() {
 
             {attending === true && (
               <>
-                <Field label="Private bus shuttle?" hint="We're running a complimentary shuttle to and from the wedding for guests staying in Pokolbin or Broke. Would your party like seats?">
+                <Field label="Private bus shuttle?" hint="We're running a complimentary shuttle to and from the wedding for guests staying in Poko or Broke. Would your party like seats?">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <Toggle active={bus === true} onClick={() => setBus(true)}>Yes please</Toggle>
                     <Toggle active={bus === false} onClick={() => setBus(false)}>We'll make our own way</Toggle>
@@ -965,8 +1080,8 @@ function Field({ label, hint, children }) {
         display: 'block', color: 'oklch(0.78 0.02 70)', marginBottom: hint ? 6 : 14,
       }} dangerouslySetInnerHTML={{ __html: label }} />
       {hint && (
-        <div className="serif" style={{
-          fontSize: 14, fontStyle: 'italic', color: 'oklch(0.66 0.02 70)', marginBottom: 14,
+        <div style={{
+          fontSize: 15, color: 'oklch(0.88 0.015 80)', lineHeight: 1.65, marginBottom: 14,
         }} dangerouslySetInnerHTML={{ __html: hint }} />
       )}
       {children}
@@ -1060,6 +1175,7 @@ function App() {
       <Hero variant={tweaks.heroVariant} />
       <Story />
       <Day />
+      <Attire />
       <Stay />
       <FAQ />
       <RSVP />
