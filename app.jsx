@@ -511,7 +511,7 @@ function Attire() {
     }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center' }}>
-          <div className="script" style={{ color: 'oklch(0.72 0.10 55)', marginBottom: 12, fontSize: 28 }}>
+          <div className="script" style={{ color: 'oklch(0.72 0.10 55)', marginBottom: 6, fontSize: 46 }}>
             what to wear
           </div>
           <h2 className="caps" style={{
@@ -1105,7 +1105,7 @@ function SectionHeader({ eyebrow, title }) {
   return (
     <div style={{ textAlign: 'center' }}>
       <div className="script" style={{
-        color: 'var(--camel)', marginBottom: 12, fontSize: 28,
+        color: 'var(--camel)', marginBottom: 6, fontSize: 46,
       }}>
         {eyebrow}
       </div>
