@@ -1021,12 +1021,9 @@ function SectionHeader({ eyebrow, title }) {
 function Footer() {
   return (
     <footer style={{
-      padding: '90px 44px 44px', textAlign: 'center',
+      padding: '70px 44px 44px', textAlign: 'center',
       background: 'var(--cream)',
     }}>
-      <div style={{ color: 'var(--ink)', opacity: 0.85, marginBottom: 24 }}>
-        <LineArtCouple color="var(--ink)" width={340} />
-      </div>
       <div className="script" style={{
         fontSize: 58, color: 'var(--camel)', lineHeight: 1, marginBottom: 14,
       }}>
