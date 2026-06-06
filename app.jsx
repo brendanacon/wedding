@@ -807,9 +807,10 @@ function RSVP() {
               </div>
             </Field>
 
-            {attending && (
-              <>
-                <Field label="Anyone else you're replying for?" hint="Replying for the whole household? Add the full name of each invited guest, so we can take care of name cards and dietaries for everyone. Only those named on your invitation, please.">
+            {attending !== null && (
+              <Field label="Anyone else you're replying for?" hint={attending
+                ? "Replying for the whole household? Add the full name of each invited guest, so we can take care of name cards and dietaries for everyone. Only those named on your invitation, please."
+                : "Declining for others as well? Add the full name of each invited guest who can't make it, so we know exactly who to mark as unavailable. Only those named on your invitation, please."}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {guests.map((g, i) => (
                       <div key={i} style={{ display: 'flex', gap: 10 }}>
@@ -839,7 +840,10 @@ function RSVP() {
                     </button>
                   </div>
                 </Field>
+            )}
 
+            {attending === true && (
+              <>
                 <Field label="Private bus shuttle?" hint="We're running a complimentary shuttle to and from the wedding for guests staying in Pokolbin or Broke. Would your party like seats?">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <Toggle active={bus === true} onClick={() => setBus(true)}>Yes please</Toggle>
