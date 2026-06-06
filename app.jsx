@@ -574,21 +574,14 @@ function Attire() {
         </div>
 
         {/* Please leave behind */}
-        <div style={{
-          marginTop: 24, padding: 36, textAlign: 'center',
-          border: '1px dashed oklch(0.55 0.03 50)',
+        <p className="serif" style={{
+          marginTop: 36, fontSize: 16, fontStyle: 'italic',
+          color: 'oklch(0.80 0.02 70)', textAlign: 'center',
+          maxWidth: 620, margin: '36px auto 0', lineHeight: 1.6,
         }}>
-          <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', marginBottom: 12 }}>
-            Please leave behind
-          </div>
-          <p className="serif" style={{
-            fontSize: 20, fontStyle: 'italic', color: 'oklch(0.90 0.015 80)',
-            maxWidth: 620, margin: '0 auto', lineHeight: 1.55,
-          }}>
-            Erika has an irrational distaste for cowboy hats and suit vests, so
-            please leave those at home!
-          </p>
-        </div>
+          One small ask: Erika has an irrational distaste for cowboy hats and suit
+          vests, so please leave those at home!
+        </p>
       </div>
     </section>
   );
