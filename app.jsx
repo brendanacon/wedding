@@ -759,7 +759,6 @@ function RSVP() {
                 fontSize: 24, fontFamily: 'Cormorant Garamond, serif',
                 fontStyle: 'italic', textAlign: 'center', outline: 'none',
               }}
-              autoFocus
             />
             <div>
               <button type="submit" disabled={!name.trim()}
