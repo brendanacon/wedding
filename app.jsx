@@ -387,7 +387,7 @@ function Day() {
               {[
                 ['3:00', 'Pre-ceremony', 'Arrive, enjoy a drink &amp; some live music, then find your seat'],
                 ['3:30', 'Ceremony', 'A strict start, so please be seated in good time'],
-                ['4:15', 'Canapé hour', 'Drinks &amp; canapés on the terraces'],
+                ['4:15', 'Canapé hour', 'Drinks &amp; canapés'],
                 ['5:30', 'Reception', 'Dinner, speeches &amp; dancing'],
                 ['11:00', 'Event finish', ''],
               ].map(([time, title, sub], i, arr) => (
