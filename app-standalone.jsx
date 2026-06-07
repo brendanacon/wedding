@@ -152,7 +152,7 @@ function Hero({ variant }) {
     <section id="top" style={{
       minHeight: '100vh', position: 'relative',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '80px 44px 80px',
+      padding: '120px 44px 80px',
     }}>
       <div style={{ maxWidth: 720, textAlign: 'center', width: '100%' }}>
         <div className="script" style={{
@@ -991,6 +991,7 @@ function App() {
 
   return (
     <>
+      <Nav />
       <Hero variant={tweaks.heroVariant} />
       <Story />
       <Day />
