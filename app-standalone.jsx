@@ -440,7 +440,7 @@ function Day() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <Row k="Where" v="Hunter Valley, NSW" />
                 <Row k="Attire" v="Semi-formal. For the men, a suit or blazer and trousers in any colour — navy, charcoal and black all work perfectly. For the women, dresses below the knee." />
-                <Row k="Weather" v="Early autumn. Warm days, cool evenings, so bring a wrap." />
+                <Row k="Weather" v="Early autumn. Warm days, cool evenings." />
                 <Row k="Getting there" v="On-site parking, or hop on our free bus (stay in Pokolbin or Broke to use it). Details closer to the day." />
                 <Row k="Kids" v="Little ones are welcome. Just have a chat with us first." />
               </div>

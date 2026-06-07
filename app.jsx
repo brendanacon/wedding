@@ -430,7 +430,7 @@ function Day() {
                 Adam's Peak Country Estate
               </h3>
               <p style={{ fontSize: 14, color: 'var(--ink-soft)', lineHeight: 1.85, marginBottom: 28 }}>
-                A 100-acre country estate in Broke, set against sweeping views of the
+                A country estate in Broke, set against sweeping views of the
                 Yellow Rock Escarpment and the Brokenback Ranges. The Barn, The Hay Shed,
                 and the grounds — including a century-old Iron Bark tree — make it one
                 of the Hunter Valley's most beautiful private settings. We're keeping
@@ -441,8 +441,8 @@ function Day() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <Row k="Address" v="66 Adams Peak Rd, Broke NSW 2330" />
-                <Row k="Weather" v="Early autumn. Warm days, cool evenings, so bring a wrap." />
-                <Row k="Getting there" v="Hop on our free shuttle bus to and from the wedding for guests staying in Poko or Broke. There is also on-site parking. Details closer to the date." />
+                <Row k="Weather" v="Early autumn. Warm days, cool evenings." />
+                <Row k="Getting there" v="Hop on our free shuttle bus to and from the wedding for guests staying in Pokolbin or Broke. There is also on-site parking. Details closer to the date." />
                 <Row k="Kids" v="Little ones are welcome. Just have a chat with us first." />
               </div>
             </div>
@@ -631,14 +631,14 @@ function Stay() {
     },
     {
       name: "The Lane Retreat",
-      area: "Pokolbin",
+      area: "Pokolbinlbin",
       cap: "Sleeps 2",
       note: "An elegant 4-star retreat with a pool, sun terrace and lush gardens, just a short drive from the wineries.",
       link: "https://www.booking.com/hotel/au/the-lane-retreat.en-gb.html?label=gen173nr-10CAEoggI46AdIM1gEaA-IAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AtOZgNEGwAIB0gIkNjI5MWZkMmUtNjUxMS00NDRlLWI3ZGEtNDY3YzgzNDIyNTYy2AIB4AIB&aid=304142&ucfs=1&arphpl=1&checkin=2027-04-02&checkout=2027-04-05",
     },
     {
       name: "Wine Country Villas",
-      area: "Pokolbin",
+      area: "Pokolbinlbin",
       cap: "Sleeps 2",
       note: "Private villas set on 25 acres in the heart of the Hunter, a peaceful base close to the cellar doors.",
       link: "https://www.booking.com/hotel/au/wine-country-villas.en-gb.html?aid=304142&checkin=2027-04-02&checkout=2027-04-04&group_adults=2&no_rooms=1&group_children=0",
@@ -655,7 +655,7 @@ function Stay() {
           maxWidth: 640, margin: '36px auto 0', color: 'var(--ink-soft)',
           lineHeight: 1.5,
         }}>
-          The Hunter is best as a long weekend. To use the free bus service to and from the wedding, we ask that you stay in Pokolbin or Broke. Here are a few places to start your search.
+          The Hunter is best as a long weekend. To use the free bus service to and from the wedding, we ask that you stay in Pokolbinlbin or Broke. Here are a few places to start your search.
         </p>
 
         <div className="stack-md" style={{
@@ -732,7 +732,7 @@ function FAQ() {
   const items = [
     ['Can I bring a plus one?', 'You would have been told if you have a plus one. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
     ['Are kids invited?', 'Little ones are welcome. Just have a chat with us first so we can plan properly.'],
-    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
+    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbinlbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
     ['Is there parking?', 'Yes. Free, on-site, and plenty of it.'],
     ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies, intolerances, and preferences. The kitchen is excellent and very accommodating.'],
     ['Do you have a gift registry?', 'We don\'t have a gift registry — we have all we need. If you\'d like to give us something, there will be a wishing well on the night.'],
@@ -977,7 +977,7 @@ function RSVP() {
 
             {attending === true && (
               <>
-                <Field label="Private bus shuttle?" hint="We're running a complimentary shuttle to and from the wedding for guests staying in Poko or Broke. Would your party like seats?">
+                <Field label="Private bus shuttle?" hint="We're running a complimentary shuttle to and from the wedding for guests staying in Pokolbin or Broke. Would your party like seats?">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <Toggle active={bus === true} onClick={() => setBus(true)}>Yes please</Toggle>
                     <Toggle active={bus === false} onClick={() => setBus(false)}>We'll make our own way</Toggle>
