@@ -53,11 +53,28 @@ function LineArtCouple({ color = 'currentColor', width = 420 }) {
 // ──────────────────────────────────────────────────────────
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState('');
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    const ids = ['story', 'day', 'stay', 'faq', 'rsvp'];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      },
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+    );
+    ids.forEach(id => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
+
   const items = [
     ['story', 'The Story'],
     ['day', 'The Day'],
@@ -79,16 +96,13 @@ function Nav() {
         fontSize: 14, textDecoration: 'none', color: 'var(--ink)',
         letterSpacing: '0.18em', whiteSpace: 'nowrap',
       }}>
-        E <span style={{ fontFamily: 'Dancing Script, cursive', textTransform: 'none', fontSize: 20, fontWeight: 600, letterSpacing: 0 }}>&</span> B
+        E <span style={{ fontFamily: 'Mrs Saint Delafield, cursive', textTransform: 'none', fontSize: 20, fontWeight: 600, letterSpacing: 0 }}>&</span> B
       </a>
       <div className="nav-links" style={{ display: 'flex', gap: 36 }}>
         {items.map(([id, label]) => (
-          <a key={id} href={`#${id}`} className="mono" style={{
-            color: 'var(--ink)', textDecoration: 'none',
-            transition: 'color 0.2s', whiteSpace: 'nowrap',
-          }}
-          onMouseEnter={e => e.target.style.color = 'var(--camel)'}
-          onMouseLeave={e => e.target.style.color = 'var(--ink)'}>
+          <a key={id} href={`#${id}`} className={`mono nav-link${active === id ? ' nav-link--active' : ''}`} style={{
+            textDecoration: 'none', transition: 'color 0.2s', whiteSpace: 'nowrap',
+          }}>
             {label}
           </a>
         ))}
