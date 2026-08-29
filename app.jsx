@@ -208,7 +208,7 @@ function Hero({ variant }) {
           Hunter Valley, NSW
         </div>
         <div className="mono" style={{ color: 'var(--ink-soft)', marginTop: 18 }}>
-          Ceremony at 4pm
+          Starts at 3pm
         </div>
 
         <div style={{ marginTop: 38 }}>
@@ -447,9 +447,7 @@ function Day() {
                 A private country estate in Broke, where the whole day happens in
                 one place. The ceremony is outdoors on the lawn, canapés follow
                 outside on the grounds, then dinner and dancing move into The Barn,
-                which is fully enclosed and air-conditioned. If the weather turns,
-                the ceremony shifts under the covered Hay Shed, so it goes ahead
-                rain or shine.
+                which is fully enclosed and air-conditioned.
               </p>
 
               <hr className="hairline" style={{ margin: '24px 0' }} />
@@ -535,8 +533,8 @@ function Attire() {
           color: 'oklch(0.90 0.015 80)', lineHeight: 1.55,
         }}>
           We ask that you wear semi-formal attire. The wedding is on a country
-          estate, with an outdoor ceremony and a barn-style reception. Dress for
-          the setting. Bring your sunglasses, and skip the stilettos.
+          estate, with an outdoor ceremony and a barn-style reception.
+          Bring your sunglasses, and skip the stilettos.
         </p>
 
         {/* For her / For him */}
@@ -546,8 +544,8 @@ function Attire() {
           <div style={cardStyle}>
             <div className="serif" style={headingStyle}>For the women</div>
             <p style={bodyStyle}>
-              We ask for dresses below the knee, with heels or elegant flats. We
-              love colour, so leave that black or white dress behind.
+              We ask for dresses below the knee, with heels or elegant flats.
+              We love colour.
             </p>
           </div>
           <div style={cardStyle}>
@@ -696,10 +694,10 @@ function FAQ() {
   const items = [
     ['Can I bring a plus one?', 'You would have been told if you have a plus one. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
     ['Are kids invited?', 'Little ones are welcome. Just have a chat with us first so we can plan properly.'],
-    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
+    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Timings will be shared closer to the day.'],
     ['Is there parking?', 'Yes. Free, on-site, and plenty of it.'],
-    ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies, intolerances, and preferences. The kitchen is excellent and very accommodating.'],
-    ['What is the brunch the next morning?', 'A very casual continental brunch with egg and bacon rolls. Come any time between 9:30 and 11, stay as long or as little as you like. There will be picnic rugs out, so dress as comfortably as you please.'],
+    ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies and intolerances.'],
+    ['What is the brunch the next morning?', 'A casual continental brunch with egg and bacon rolls, from 9:30 to 11. Arrive whenever suits, but leave yourself time to enjoy it, as we do need to wrap up at 11. Picnic rugs will be out, so dress as comfortably as you please.'],
     ['Do you have a gift registry?', 'We don\'t have a gift registry. We have all we need, but if you\'d like to give us something, there will be a wishing well on the night.'],
   ];
   return (
@@ -958,7 +956,7 @@ function RSVP() {
                   )}
                 </Field>
 
-                <Field label="Join us for brunch the next morning?" hint="A relaxed continental brunch with egg and bacon rolls, from 9:30 to 11. Picnic rugs on the grass, come and go as you please.">
+                <Field label="Join us for brunch the next morning?" hint="A relaxed continental brunch with egg and bacon rolls, from 9:30 to 11. Picnic rugs on the grass. Arrive whenever suits, though we do need to wrap up at 11.">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <Toggle active={brunch === true} onClick={() => setBrunch(true)}>We'll be there</Toggle>
                     <Toggle active={brunch === false} onClick={() => setBrunch(false)}>Not this time</Toggle>

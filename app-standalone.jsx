@@ -207,7 +207,7 @@ function Hero({ variant }) {
           Hunter Valley, NSW
         </div>
         <div className="mono" style={{ color: 'var(--ink-soft)', marginTop: 18 }}>
-          Ceremony at 4pm
+          Starts at 3pm
         </div>
 
         <div style={{ marginTop: 70 }}>
@@ -446,9 +446,7 @@ function Day() {
                 A private country estate in Broke, where the whole day happens in
                 one place. The ceremony is outdoors on the lawn, canapés follow
                 outside on the grounds, then dinner and dancing move into The Barn,
-                which is fully enclosed and air-conditioned. If the weather turns,
-                the ceremony shifts under the covered Hay Shed, so it goes ahead
-                rain or shine.
+                which is fully enclosed and air-conditioned.
               </p>
 
               <hr className="hairline" style={{ margin: '24px 0' }} />
@@ -617,9 +615,9 @@ function FAQ() {
     ['What should I wear?', 'Semi-formal attire. For the men, a suit or blazer and trousers in navy, charcoal, black or anything in between. For the women, dresses below the knee. It\'s an outdoor, barn-style reception on grass, so consider your heels.'],
     ['Can I bring a plus one?', 'If your invitation includes a plus one, it will say so explicitly. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
     ['Are kids invited?', 'Little ones are welcome. Just have a chat with us first so we can plan properly.'],
-    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding. To use it, please make sure you\'re staying in the Pokolbin or Broke area so we can get everyone to and from the event on time. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
+    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding. To use it, please make sure you\'re staying in the Pokolbin or Broke area so we can get everyone to and from the event on time. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Timings will be shared closer to the day.'],
     ['Is there parking?', 'Yes. Free, on-site, and plenty of it.'],
-    ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies, intolerances, and preferences. The kitchen is excellent and very accommodating.'],
+    ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies and intolerances.'],
     ['Gifts?', 'Your presence is the real gift. There\'ll be a wishing well on the night for anyone who\'d like to contribute.'],
   ];
   return (
