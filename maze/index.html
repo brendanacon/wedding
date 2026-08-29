@@ -29,7 +29,7 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
-    padding: 56px 24px 72px;
+    padding: 56px 24px 44px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -130,13 +130,24 @@
   }
 
   .controls {
-    margin-top: 34px;
+    margin-top: 26px;
     display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
   }
   /* display:contents lets the grouped buttons sit in the same flex row */
   .grp { display: contents; }
   .grp[hidden] { display: none; }
-  #expandBtn { border-color: var(--camel); color: var(--camel-deep); }
+  /* Pinned to the viewport: in the controls row it fell below the fold on
+     most laptops, which made it impossible to find. */
+  #expandBtn {
+    position: fixed;
+    top: 14px; right: 14px;
+    z-index: 60;
+    padding: 10px 18px;
+    background: var(--cream);
+    border-color: var(--camel);
+    color: var(--camel-deep);
+    box-shadow: 0 1px 6px oklch(0.22 0.015 50 / 0.10);
+  }
 
   /* full screen: drop the page furniture and give the board the room */
   body.expanded { padding: 14px 12px 18px; justify-content: center; }
@@ -166,7 +177,7 @@
 
   .back {
     display: inline-block;
-    margin-top: 48px;
+    margin-top: 30px;
     font-size: 11px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -177,7 +188,7 @@
   .back:hover { color: var(--camel); }
 
   @media (max-width: 560px) {
-    body { padding: 40px 16px 56px; }
+    body { padding: 40px 16px 36px; }
     .board { padding: 10px; }
     .kb { display: none; }   /* no arrow keys on a phone */
   }
