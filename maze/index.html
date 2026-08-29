@@ -505,7 +505,207 @@
   // ══════════════════════════════════════════════════════════
   var rc = document.getElementById('run');
   var rx = rc.getContext('2d');
-  var R = { w: 0, h: 0, ground: 0, figH: 0 };
+  var R = { w: 0, h: 0, ground: 0, figH: 0, px: 4 };
+
+  // ── Sprites ───────────────────────────────────────────────
+  // Hand-set pixel art in the colours of the reference: Brendan in his
+  // tan jacket and navy jeans, Erika in the check coat and blue jeans.
+  var PAL = {
+    h: '#6B4526', H: '#8A5C30',            // his hair
+    s: '#EDC9A6', S: '#CB9E78', i: '#2A1D14', // skin, shade, eye
+    j: '#A96B38', J: '#C4854F', n: '#6E4322', // jacket, highlight, collar
+    t: '#33291F',                            // satchel
+    d: '#37455A', D: '#28313F',              // his denim
+    b: '#6B4A33', B: '#4A3222',              // boots
+    k: '#4A3527', K: '#5E4433',              // her hair
+    c: '#3E3228', C: '#6B573F',              // her check coat
+    u: '#3F5A78', U: '#32485F',              // her jeans
+    g: '#CFC3A8',                            // her bag
+    p: '#3B5A34', P: '#47693D', Q: '#547A46',// pine
+    w: '#6B4A32', W: '#4E3625', r: '#5E7C48' // trunk, grass
+  };
+
+  // Brendan mid-stride, drawn facing left like the reference and
+  // flipped when he runs, so he faces the way he is going.
+  var BRENDAN_A = [
+    '.......hhhhh......',
+    '......hhhhhhh.....',
+    '......hhhhhhhh....',
+    '......hhssssss....',
+    '......hsssissss...',
+    '......hssssssss...',
+    '.......sssssS.....',
+    '.......nnnnn......',
+    '......jjjjjjj.....',
+    '.....jjjjtjjjj....',
+    '...sjjjjtjjjjj....',
+    '...sjjjjttjjjjs...',
+    '....jjjjttjjjjs...',
+    '.....jjjjjjjj.....',
+    '......jjjjjj......',
+    '......dddddd......',
+    '.....dddd.ddd.....',
+    '....dddd..dddd....',
+    '...dddd....dddd...',
+    '..dddd.....dddd...',
+    '.bbbb.......ddd...',
+    '.BBB........ddd...',
+    '............bbbb..',
+    '............BBBB..'
+  ];
+  var BRENDAN_B = [
+    '.......hhhhh......',
+    '......hhhhhhh.....',
+    '......hhhhhhhh....',
+    '......hhssssss....',
+    '......hsssissss...',
+    '......hssssssss...',
+    '.......sssssS.....',
+    '.......nnnnn......',
+    '......jjjjjjj.....',
+    '.....jjjjtjjjj....',
+    '...sjjjjtjjjjj....',
+    '...sjjjjttjjjjs...',
+    '....jjjjttjjjjs...',
+    '.....jjjjjjjj.....',
+    '......jjjjjj......',
+    '......dddddd......',
+    '.....ddd.dddd.....',
+    '....ddd...dddd....',
+    '....ddd....dddd...',
+    '...ddd......ddd...',
+    '...ddd......bbbb..',
+    '...ddd......BBB...',
+    '..bbbb............',
+    '..BBBB............'
+  ];
+  var BRENDAN_JUMP = [
+    '.......hhhhh......',
+    '......hhhhhhh.....',
+    '......hhhhhhhh....',
+    '......hhssssss....',
+    '......hsssissss...',
+    '......hssssssss...',
+    '.......sssssS.....',
+    '.......nnnnn......',
+    '......jjjjjjj.....',
+    '.....jjjjtjjjj....',
+    '...sjjjjtjjjjj....',
+    '...sjjjjttjjjjs...',
+    '....jjjjttjjjjs...',
+    '.....jjjjjjjj.....',
+    '......jjjjjj......',
+    '......dddddd......',
+    '.....dddddddd.....',
+    '....dddd..dddd....',
+    '...dddd....dddd...',
+    '..bbbb......bbbb..',
+    '..BBB........BBB..',
+    '..................',
+    '..................',
+    '..................'
+  ];
+  var BRENDAN_HUG = [
+    '.......hhhhh......',
+    '......hhhhhhh.....',
+    '......hhhhhhhh....',
+    '......hhssssss....',
+    '......hsssissss...',
+    '......hssssssss...',
+    '.......sssssS.....',
+    '.......nnnnn......',
+    '......jjjjjjj.....',
+    '.....jjjjtjjjjjjjj',
+    '...sjjjjtjjjjjjjjs',
+    '...sjjjjttjjjj....',
+    '....jjjjttjjj.....',
+    '.....jjjjjjjj.....',
+    '......jjjjjj......',
+    '......dddddd......',
+    '......dddddd......',
+    '.....ddd.ddd......',
+    '.....ddd.ddd......',
+    '.....ddd.ddd......',
+    '.....ddd.ddd......',
+    '.....ddd.ddd......',
+    '....bbbb.bbbb.....',
+    '....BBB...BBB.....'
+  ];
+  var ERIKA = [
+    '.....kkkkkk.......',
+    '....kkkkkkkk......',
+    '....kkkkkkkkk.....',
+    '....kkkssssss.....',
+    '....kkksssiss.....',
+    '....kkkssssss.....',
+    '....kkkkssssS.....',
+    '...kkkkcccccs.....',
+    '...kkkcCcCcCs.....',
+    '...kkkCcCcCcs.....',
+    '...kkkcCcCcC......',
+    '..kkkkCcCcCcg.....',
+    '..kkkcCcCcCcg.....',
+    '..kkkCcCcCcCg.....',
+    '...kkcCcCcCc......',
+    '....cCcCcCcC......',
+    '.....uuuuuu.......',
+    '.....uuuuuu.......',
+    '.....uu..uu.......',
+    '.....uu..uu.......',
+    '.....uU..Uu.......',
+    '.....uU..Uu.......',
+    '....bbb..bbb......',
+    '....BBB..BBB......'
+  ];
+  var PINE = [
+    '......pp......',
+    '.....pPPp.....',
+    '.....pPPp.....',
+    '....pPQQPp....',
+    '....pPPPPp....',
+    '...pPQPPQPp...',
+    '...pPPPPPPp...',
+    '..pPQPPPPQPp..',
+    '..pPPPPPPPPp..',
+    '.pPQPPPPPPQPp.',
+    '.pPPPPPPPPPPp.',
+    'pPQPPPPPPPPQPp',
+    'pPPPPPPPPPPPPp',
+    '......ww......',
+    '......wW......',
+    '......ww......',
+    '.rr...wW...rr.',
+    'rrrr..ww..rrrr'
+  ];
+  var BUSH = [
+    '....pPPp....',
+    '...pPQQPp...',
+    '..pPPPPPPp..',
+    '.pPQPPPPQPp.',
+    'pPPPPPPPPPPp',
+    'pPQPPPPPPQPp',
+    '.pPPPPPPPPp.',
+    '.....ww.....',
+    '.rr..wW..rr.',
+    'rrrr.ww.rrrr'
+  ];
+
+  function drawSprite(rows, left, top, px, flip) {
+    var wide = rows[0].length;
+    for (var r = 0; r < rows.length; r++) {
+      var row = rows[r];
+      for (var c = 0; c < wide; c++) {
+        var ch = row.charAt(c);
+        if (ch === '.' || ch === '') continue;
+        var colour = PAL[ch];
+        if (!colour) continue;
+        var cx = flip ? (wide - 1 - c) : c;
+        rx.fillStyle = colour;
+        rx.fillRect(Math.round(left + cx * px), Math.round(top + r * px),
+                    Math.ceil(px), Math.ceil(px));
+      }
+    }
+  }
   var G = null;      // game state
   var raf = null;
   var lastT = 0;
@@ -518,7 +718,8 @@
     rx.setTransform(dpr, 0, 0, dpr, 0, 0);
     R.w = w; R.h = h;
     R.ground = h * 0.82;
-    R.figH = h * 0.21;
+    R.px = Math.max(2, Math.round((h * 0.21) / BRENDAN_A.length));
+    R.figH = BRENDAN_A.length * R.px;
     if (G) { G.y = Math.min(G.y, 0); drawRun(); }
   }
 
@@ -538,8 +739,8 @@
       erikaX: null,
       hug: 0
     };
-    for (var i = 0; i < 22; i++) {
-      G.pebbles.push({ x: Math.random() * R.w, w: 2 + Math.random() * 5 });
+    for (var i = 0; i < 10; i++) {
+      G.pebbles.push({ x: Math.random() * R.w, w: 2 + Math.random() * 3 });
     }
     winEl.classList.remove('show');
     overEl.classList.remove('show');
@@ -564,10 +765,12 @@
 
   function spawn() {
     // every obstacle is clearable: heights stay well under the jump apex
-    var tall = Math.random() < 0.35;
-    var oh = R.figH * (tall ? 0.72 : 0.46);
-    var ow = R.figH * (tall ? 0.34 : 0.46);
-    G.obstacles.push({ x: R.w + ow, w: ow, h: oh, tall: tall });
+    var tall = Math.random() < 0.4;
+    var art = tall ? PINE : BUSH;
+    var ow = art[0].length * R.px;
+    var oh = art.length * R.px;
+    // the hit box is narrower than the drawing, so a clipped branch forgives
+    G.obstacles.push({ x: R.w + ow, w: ow, h: oh, cw: ow * 0.55, art: art });
   }
 
   function tick(dt) {
@@ -627,13 +830,14 @@
   }
 
   function hits(o) {
-    var half = R.figH * 0.17;                 // forgiving body width
+    var half = R.figH * 0.15;                 // forgiving body width
     var feet = R.ground - G.y;
-    var bodyTop = feet - R.figH * 0.92;
-    var oTop = R.ground - o.h;
-    var overlapX = (G.x + half > o.x) && (G.x - half < o.x + o.w);
-    var overlapY = bodyTop < R.ground && feet > oTop;
-    return overlapX && overlapY;
+    var pad = (o.w - o.cw) / 2;               // centre the narrower hit box
+    var left = o.x + pad, right = o.x + o.w - pad;
+    // grass at the foot of the sprite is scenery, not something to trip on
+    var oTop = R.ground - (o.h - 2 * R.px);
+    var overlapX = (G.x + half > left) && (G.x - half < right);
+    return overlapX && feet > oTop;
   }
 
   // ── Runner drawing ────────────────────────────────────────
@@ -671,126 +875,39 @@
     if (G.phase === 'won') {
       drawEmbrace();
     } else {
-      drawBrendan(G.x, feet, G.y > 0.5);
-      if (G.erikaX !== null) drawErika(G.erikaX, R.ground, true);
+      drawBrendan(G.x + (G.pan || 0), feet, G.y > 0.5);
+      if (G.erikaX !== null) drawErika(G.erikaX + (G.pan || 0), R.ground);
     }
 
     drawScore();
   }
 
   function drawObstacle(o) {
-    rx.strokeStyle = WALL;
-    rx.lineWidth = Math.max(1.5, R.figH * 0.075);
-    rx.lineCap = 'round';
-    var base = R.ground;
-    if (o.tall) {
-      // a slim shrub
-      rx.beginPath();
-      rx.moveTo(o.x + o.w / 2, base);
-      rx.lineTo(o.x + o.w / 2, base - o.h);
-      rx.stroke();
-      rx.beginPath();
-      rx.arc(o.x + o.w / 2, base - o.h, o.w * 0.62, Math.PI * 0.15, Math.PI * 0.85, true);
-      rx.stroke();
-    } else {
-      // a tuft of grass
-      for (var k = -1; k <= 1; k++) {
-        rx.beginPath();
-        rx.moveTo(o.x + o.w / 2, base);
-        rx.quadraticCurveTo(
-          o.x + o.w / 2 + k * o.w * 0.42, base - o.h * 0.55,
-          o.x + o.w / 2 + k * o.w * 0.62, base - o.h
-        );
-        rx.stroke();
-      }
-    }
+    drawSprite(o.art, o.x + (G.pan || 0), R.ground - o.h, R.px, false);
   }
 
+  // Everyone is drawn facing right. Brendan runs that way, so he is never
+  // flipped; Erika is waiting for him, so she is flipped to look back down
+  // the field at him.
   function drawBrendan(x, feetY, airborne) {
-    var h = R.figH;
-    var lw = Math.max(2, h * 0.105);
-    rx.strokeStyle = DUSK; rx.fillStyle = DUSK;
-    rx.lineWidth = lw; rx.lineCap = 'round'; rx.lineJoin = 'round';
-
-    var headR = h * 0.15;
-    var headY = feetY - h + headR;
-    var hipY = feetY - h * 0.42;
-    var shoulderY = feetY - h * 0.76;
-
-    rx.beginPath(); rx.arc(x, headY, headR, 0, Math.PI * 2); rx.fill();
-    rx.beginPath(); rx.moveTo(x, headY + headR); rx.lineTo(x, hipY); rx.stroke();
-
-    var a = airborne ? 0.9 : Math.sin(G.t);
-    var b = airborne ? -0.5 : Math.sin(G.t + Math.PI);
-
-    // legs
-    rx.beginPath(); rx.moveTo(x, hipY);
-    rx.lineTo(x + a * h * 0.26, airborne ? feetY - h * 0.10 : feetY); rx.stroke();
-    rx.beginPath(); rx.moveTo(x, hipY);
-    rx.lineTo(x + b * h * 0.26, airborne ? feetY - h * 0.04 : feetY); rx.stroke();
-    // arms
-    rx.beginPath(); rx.moveTo(x, shoulderY);
-    rx.lineTo(x + b * h * 0.22, shoulderY + h * 0.24); rx.stroke();
-    rx.beginPath(); rx.moveTo(x, shoulderY);
-    rx.lineTo(x + a * h * 0.22, shoulderY + h * 0.24); rx.stroke();
+    var art = airborne ? BRENDAN_JUMP
+            : (Math.sin(G.t) > 0 ? BRENDAN_A : BRENDAN_B);
+    var wide = art[0].length * R.px;
+    drawSprite(art, x - wide / 2, feetY - art.length * R.px, R.px, false);
   }
 
-  function drawErika(x, feetY, waving) {
-    var h = R.figH;
-    var lw = Math.max(2, h * 0.105);
-    rx.strokeStyle = CAMEL; rx.fillStyle = CAMEL;
-    rx.lineWidth = lw; rx.lineCap = 'round'; rx.lineJoin = 'round';
-
-    var headR = h * 0.15;
-    var headY = feetY - h + headR;
-    var hemY = feetY - h * 0.12;
-
-    rx.beginPath(); rx.arc(x, headY, headR, 0, Math.PI * 2); rx.fill();
-    rx.beginPath(); rx.arc(x + headR * 0.92, headY - headR * 0.45, headR * 0.55, 0, Math.PI * 2); rx.fill();
-
-    // a simple A-line dress
-    rx.beginPath();
-    rx.moveTo(x, headY + headR * 0.5);
-    rx.lineTo(x - h * 0.19, hemY);
-    rx.lineTo(x + h * 0.19, hemY);
-    rx.closePath();
-    rx.fill();
-
-    rx.beginPath(); rx.moveTo(x - h * 0.06, hemY); rx.lineTo(x - h * 0.06, feetY); rx.stroke();
-    rx.beginPath(); rx.moveTo(x + h * 0.06, hemY); rx.lineTo(x + h * 0.06, feetY); rx.stroke();
-
-    // an arm out toward him
-    var lift = waving ? Math.sin(G.t * 0.8) * h * 0.06 : 0;
-    rx.beginPath();
-    rx.moveTo(x - h * 0.05, feetY - h * 0.72);
-    rx.lineTo(x - h * 0.30, feetY - h * 0.60 + lift);
-    rx.stroke();
+  function drawErika(x, feetY) {
+    var wide = ERIKA[0].length * R.px;
+    drawSprite(ERIKA, x - wide / 2, feetY - ERIKA.length * R.px, R.px, true);
   }
 
   function drawEmbrace() {
-    var h = R.figH;
     var cx = (G.x + G.erikaX) / 2 + (G.pan || 0);
-    var gap = h * 0.30;
-    var feetY = R.ground;
-
-    // both lean in, arms across each other
-    drawBrendan(cx - gap, feetY, false);
-    drawErika(cx + gap, feetY, false);
-
-    rx.lineCap = 'round';
-    rx.lineWidth = Math.max(2, h * 0.105);
-    // his arm around her
-    rx.strokeStyle = DUSK;
-    rx.beginPath();
-    rx.moveTo(cx - gap, feetY - h * 0.76);
-    rx.lineTo(cx + gap * 0.85, feetY - h * 0.66);
-    rx.stroke();
-    // hers around him
-    rx.strokeStyle = CAMEL;
-    rx.beginPath();
-    rx.moveTo(cx + gap, feetY - h * 0.72);
-    rx.lineTo(cx - gap * 0.85, feetY - h * 0.60);
-    rx.stroke();
+    var wide = BRENDAN_HUG[0].length * R.px;
+    var lean = R.px * 5;              // they overlap, his arm around her
+    var top = R.ground - BRENDAN_HUG.length * R.px;
+    drawSprite(ERIKA, cx + lean - wide / 2, top, R.px, true);
+    drawSprite(BRENDAN_HUG, cx - lean - wide / 2, top, R.px, false);
   }
 
   function drawScore() {
