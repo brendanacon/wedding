@@ -507,241 +507,84 @@
   var rx = rc.getContext('2d');
   var R = { w: 0, h: 0, ground: 0, figH: 0, px: 4 };
 
-  // ── Sprites ───────────────────────────────────────────────
-  // Hand-set pixel art in the colours of the reference: Brendan in his
-  // tan jacket and navy jeans, Erika in the check coat and blue jeans.
-  var PAL = {
-    h: '#6B4526', H: '#8A5C30',            // his hair
-    s: '#EDC9A6', S: '#CB9E78', i: '#2A1D14', // skin, shade, eye
-    j: '#A96B38', J: '#C4854F', n: '#6E4322', // jacket, highlight, collar
-    t: '#33291F',                            // satchel
-    d: '#37455A', D: '#28313F',              // his denim
-    b: '#6B4A33', B: '#4A3222',              // boots
-    k: '#4A3527', K: '#5E4433',              // her hair
-    c: '#3E3228', C: '#6B573F',              // her check coat
-    u: '#3F5A78', U: '#32485F',              // her jeans
-    g: '#CFC3A8',                            // her bag
-    p: '#3B5A34', P: '#47693D', Q: '#547A46',// pine
-    w: '#6B4A32', W: '#4E3625', r: '#5E7C48' // trunk, grass
+  // ── Artwork ───────────────────────────────────────────────
+  // Erika and Brendan's own sprites. Each is trimmed to its ink on load
+  // so every frame shares one baseline, otherwise he bobs as the run
+  // cycle plays.
+  var ART = {};
+  var ARTFILES = {
+    run1: 'sprites/brendan-run-1.png', run2: 'sprites/brendan-run-2.png',
+    run3: 'sprites/brendan-run-3.png', run4: 'sprites/brendan-run-4.png',
+    run5: 'sprites/brendan-run-5.png', run6: 'sprites/brendan-run-6.png',
+    run7: 'sprites/brendan-run-7.png', run8: 'sprites/brendan-run-8.png',
+    jump: 'sprites/brendan-jump.png', trip: 'sprites/brendan-trip.png',
+    wait: 'sprites/erika-wait.png',   spot: 'sprites/erika-spot.png',
+    heart: 'sprites/erika-heart.png', embrace: 'sprites/embrace.png',
+    bush: 'sprites/bush.png',         pine: 'sprites/pine.png'
   };
+  var RUN_KEYS = ['run1','run2','run3','run4','run5','run6','run7','run8'];
+  var artReady = false;
 
-  // Brendan drawn facing right, one frame per phase of the run.
-  var B_HEAD = [
-    '.......hhhhh......',
-    '......hhhhhhh.....',
-    '......hhhhhhhh....',
-    '......hhssssss....',
-    '......hsssissss...',
-    '......hssssssss...',
-    '.......sssssS.....',
-    '.......nnnnn......'
-  ];
-  var B_TORSO = [
-    '......jjjjjjj.....',
-    '.....jjjjtjjjj....',
-    '...sjjjjtjjjjj....',
-    '...sjjjjttjjjjs...',
-    '....jjjjttjjjjs...',
-    '.....jjjjjjjj.....',
-    '......jjjjjj......'
-  ];
-  var B_LEGS = [
-    [
-      '......dddddd......',
-      '.....dddd.ddd.....',
-      '....dddd..dddd....',
-      '...dddd....dddd...',
-      '..dddd.....dddd...',
-      '.bbbb.......ddd...',
-      '.BBB........ddd...',
-      '............bbbb..',
-      '............BBBB..'
-  ],
-    [
-      '......dddddd......',
-      '.....ddddddd......',
-      '....dddd..ddd.....',
-      '...dddd...dddd....',
-      '..dddd.....ddd....',
-      '..bbbb.....dddd...',
-      '..BBB.......ddd...',
-      '...........bbbb...',
-      '...........BBBB...'
-  ],
-    [
-      '......dddddd......',
-      '......dddddd......',
-      '.....ddd.ddd......',
-      '.....ddd.dddd.....',
-      '....ddd...dddd....',
-      '...bbbb....ddd....',
-      '...BBB.....dddd...',
-      '..........bbbb....',
-      '..........BBBB....'
-  ],
-    [
-      '......dddddd......',
-      '.....ddd.dddd.....',
-      '....ddd...dddd....',
-      '...ddd.....dddd...',
-      '...ddd......dddd..',
-      '...ddd.......bbbb.',
-      '...ddd.......BBB..',
-      '..bbbb............',
-      '..BBBB............'
-  ],
-    [
-      '......dddddd......',
-      '......ddddddd.....',
-      '.....ddd..dddd....',
-      '....dddd...dddd...',
-      '....ddd.....dddd..',
-      '...ddd......bbbb..',
-      '...dddd......BBB..',
-      '...bbbb...........',
-      '...BBBB...........'
-  ],
-    [
-      '......dddddd......',
-      '......dddddd......',
-      '......ddd.ddd.....',
-      '.....dddd.ddd.....',
-      '....dddd...ddd....',
-      '....ddd....bbbb...',
-      '...dddd.....BBB...',
-      '....bbbb..........',
-      '....BBBB..........'
-  ]
-  ];
-  // one sprite per phase of the stride, assembled from the shared upper body
-  var BRENDAN_RUN = B_LEGS.map(function (l) { return B_HEAD.concat(B_TORSO, l); });
-  var BRENDAN_JUMP = B_HEAD.concat(B_TORSO, [
-    '......dddddd......',
-    '.....dddddddd.....',
-    '....dddd..dddd....',
-    '...dddd....dddd...',
-    '..bbbb......bbbb..',
-    '..BBB........BBB..',
-    '..................',
-    '..................',
-    '..................'
-  ]);
-  var BRENDAN_HUG = B_HEAD.concat([
-    '......jjjjjjj.....',
-    '.....jjjjtjjjjjjjj',
-    '...sjjjjtjjjjjjjjs',
-    '...sjjjjttjjjj....',
-    '....jjjjttjjj.....',
-    '.....jjjjjjjj.....',
-    '......jjjjjj......'
-  ], [
-    '......dddddd......',
-    '......dddddd......',
-    '.....ddd.ddd......',
-    '.....ddd.ddd......',
-    '.....ddd.ddd......',
-    '.....ddd.ddd......',
-    '.....ddd.ddd......',
-    '....bbbb.bbbb.....',
-    '....BBB...BBB.....'
-  ]);
-  var ERIKA = [
-    '.....kkkkkk.......',
-    '....kkkkkkkk......',
-    '....kkkkkkkkk.....',
-    '....kkkssssss.....',
-    '....kkksssiss.....',
-    '....kkkssssss.....',
-    '....kkkkssssS.....',
-    '...kkkkcccccs.....',
-    '...kkkcCcCcCs.....',
-    '...kkkCcCcCcs.....',
-    '...kkkcCcCcC......',
-    '..kkkkCcCcCcg.....',
-    '..kkkcCcCcCcg.....',
-    '..kkkCcCcCcCg.....',
-    '...kkcCcCcCc......',
-    '....cCcCcCcC......',
-    '.....uuuuuu.......',
-    '.....uuuuuu.......',
-    '.....uu..uu.......',
-    '.....uu..uu.......',
-    '.....uU..Uu.......',
-    '.....uU..Uu.......',
-    '....bbb..bbb......',
-    '....BBB..BBB......'
-  ];
-  var PINE = [
-    '......pp......',
-    '.....pPPp.....',
-    '.....pPPp.....',
-    '....pPQQPp....',
-    '....pPPPPp....',
-    '...pPQPPQPp...',
-    '...pPPPPPPp...',
-    '..pPQPPPPQPp..',
-    '..pPPPPPPPPp..',
-    '.pPQPPPPPPQPp.',
-    '.pPPPPPPPPPPp.',
-    'pPQPPPPPPPPQPp',
-    'pPPPPPPPPPPPPp',
-    '......ww......',
-    '......wW......',
-    '......ww......',
-    '.rr...wW...rr.',
-    'rrrr..ww..rrrr'
-  ];
-  var BUSH = [
-    '.....pPPPPp.....',
-    '...pPQQPPQQPp...',
-    '..pPQQPPPPQQPp..',
-    '.pPQQPPQQPPQQPp.',
-    'pPQPPQQPPQQPPQPp',
-    'pPQQPPQQPPQQPPQp',
-    'pPPQQPPQQPPQQPPp',
-    '.pPPQQPPQQPPQPp.',
-    '..pPPQQPPQQPPp..',
-    '...rrrrrrrrrr...',
-    '..rrrrrrrrrrrr..',
-    'rrrr.rrrrrr.rrrr'
-  ];
-
-  var spriteCache = new Map();
-  function spriteCanvas(rows, px) {
-    var sizes = spriteCache.get(rows);
-    if (!sizes) { sizes = {}; spriteCache.set(rows, sizes); }
-    if (sizes[px]) return sizes[px];
-    var wide = rows[0].length;
-    var cv = document.createElement('canvas');
-    cv.width = wide * px; cv.height = rows.length * px;
-    var g = cv.getContext('2d');
-    for (var r = 0; r < rows.length; r++) {
-      for (var c = 0; c < wide; c++) {
-        var ch = rows[r].charAt(c);
-        if (ch === '.' || ch === '') continue;
-        var colour = PAL[ch];
-        if (!colour) continue;
-        g.fillStyle = colour;
-        g.fillRect(c * px, r * px, px, px);
+  function trim(img) {
+    var c = document.createElement('canvas');
+    c.width = img.naturalWidth; c.height = img.naturalHeight;
+    var g = c.getContext('2d');
+    g.drawImage(img, 0, 0);
+    var d = g.getImageData(0, 0, c.width, c.height).data;
+    var minX = c.width, minY = c.height, maxX = -1, maxY = -1;
+    for (var y = 0; y < c.height; y++) {
+      for (var x = 0; x < c.width; x++) {
+        if (d[(y * c.width + x) * 4 + 3] < 16) continue;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
       }
     }
-    sizes[px] = cv;
-    return cv;
+    if (maxX < 0) return c;
+    var w = maxX - minX + 1, h = maxY - minY + 1;
+    var t = document.createElement('canvas');
+    t.width = w; t.height = h;
+    t.getContext('2d').drawImage(c, minX, minY, w, h, 0, 0, w, h);
+    return t;
   }
 
-  function drawSprite(rows, left, top, px, flip) {
-    var img = spriteCanvas(rows, px);
-    left = Math.round(left); top = Math.round(top);
+  function loadArt(done) {
+    var names = Object.keys(ARTFILES), left = names.length;
+    if (!left) { done(); return; }
+    names.forEach(function (n) {
+      var img = new Image();
+      img.onload = function () {
+        ART[n] = trim(img);
+        if (--left === 0) { artReady = true; done(); }
+      };
+      img.onerror = function () {
+        if (--left === 0) { artReady = true; done(); }
+      };
+      img.src = ARTFILES[n];
+    });
+  }
+
+  // draw an image by its feet, centred on cx
+  function drawArt(key, cx, feetY, h, flip) {
+    var img = ART[key];
+    if (!img) return;
+    var w = img.width * (h / img.height);
+    var left = Math.round(cx - w / 2), top = Math.round(feetY - h);
+    rx.imageSmoothingEnabled = true;
+    rx.imageSmoothingQuality = 'high';
     if (flip) {
       rx.save();
-      rx.translate(left + img.width, top);
+      rx.translate(left + w, top);
       rx.scale(-1, 1);
-      rx.drawImage(img, 0, 0);
+      rx.drawImage(img, 0, 0, w, h);
       rx.restore();
     } else {
-      rx.drawImage(img, left, top);
+      rx.drawImage(img, left, top, w, h);
     }
   }
+
+
   var G = null;      // game state
   var raf = null;
   var lastT = 0;
@@ -754,8 +597,7 @@
     rx.setTransform(dpr, 0, 0, dpr, 0, 0);
     R.w = w; R.h = h;
     R.ground = h * 0.82;
-    R.px = Math.max(2, Math.round((h * 0.21) / BRENDAN_RUN[0].length));
-    R.figH = BRENDAN_RUN[0].length * R.px;
+    R.figH = Math.round(h * 0.26);
     if (G) { G.y = Math.min(G.y, 0); drawRun(); }
   }
 
@@ -804,11 +646,12 @@
   function spawn() {
     // every obstacle is clearable: heights stay well under the jump apex
     var tall = Math.random() < 0.4;
-    var art = tall ? PINE : BUSH;
-    var ow = art[0].length * R.px;
-    var oh = art.length * R.px;
+    var key = tall ? 'pine' : 'bush';
+    var img = ART[key];
+    var oh = R.figH * (tall ? 0.78 : 0.36);
+    var ow = img ? img.width * (oh / img.height) : oh;
     // the hit box is narrower than the drawing, so a clipped branch forgives
-    G.obstacles.push({ x: R.w + ow, w: ow, h: oh, cw: ow * 0.55, art: art });
+    G.obstacles.push({ x: R.w + ow, w: ow, h: oh, cw: ow * 0.7, art: key });
   }
 
   function tick(dt) {
@@ -875,7 +718,7 @@
     var pad = (o.w - o.cw) / 2;               // centre the narrower hit box
     var left = o.x + pad, right = o.x + o.w - pad;
     // grass at the foot of the sprite is scenery, not something to trip on
-    var oTop = R.ground - (o.h - 2 * R.px);
+    var oTop = R.ground - o.h * 0.88;
     var overlapX = (G.x + half > left) && (G.x - half < right);
     return overlapX && feet > oTop;
   }
@@ -923,31 +766,28 @@
   }
 
   function drawObstacle(o) {
-    drawSprite(o.art, o.x + (G.pan || 0), R.ground - o.h, R.px, false);
+    drawArt(o.art, o.x + o.w / 2 + (G.pan || 0), R.ground, o.h, false);
   }
 
   // Everyone is drawn facing right. Brendan runs that way, so he is never
   // flipped; Erika is waiting for him, so she is flipped to look back down
   // the field at him.
   function drawBrendan(x, feetY, airborne) {
-    var art = airborne ? BRENDAN_JUMP
-            : BRENDAN_RUN[Math.floor(G.stride) % BRENDAN_RUN.length];
-    var wide = art[0].length * R.px;
-    drawSprite(art, x - wide / 2, feetY - art.length * R.px, R.px, false);
+    var key = G.phase === 'over' ? 'trip'
+            : airborne ? 'jump'
+            : RUN_KEYS[Math.floor(G.stride) % RUN_KEYS.length];
+    drawArt(key, x, feetY, R.figH, false);
   }
 
+  // she is drawn facing right, so flip her to look back at him
   function drawErika(x, feetY) {
-    var wide = ERIKA[0].length * R.px;
-    drawSprite(ERIKA, x - wide / 2, feetY - ERIKA.length * R.px, R.px, true);
+    var near = (x - G.x) < R.figH * 1.6;
+    drawArt(near ? 'spot' : 'wait', x, feetY, R.figH * 0.94, true);
   }
 
   function drawEmbrace() {
     var cx = (G.x + G.erikaX) / 2 + (G.pan || 0);
-    var wide = BRENDAN_HUG[0].length * R.px;
-    var lean = R.px * 5;              // they overlap, his arm around her
-    var top = R.ground - BRENDAN_HUG.length * R.px;
-    drawSprite(ERIKA, cx + lean - wide / 2, top, R.px, true);
-    drawSprite(BRENDAN_HUG, cx - lean - wide / 2, top, R.px, false);
+    drawArt('embrace', cx, R.ground, R.figH * 1.04, false);
   }
 
   function drawScore() {
@@ -1057,8 +897,16 @@
 
     if (which === 'run') {
       tuneJump();
-      newGame();
-      setTimeout(function () { rc.focus(); loop(); }, 650);
+      if (artReady) {
+        newGame();
+        setTimeout(function () { rc.focus(); loop(); }, 650);
+      } else {
+        loadArt(function () {
+          newGame();
+          rc.focus();
+          loop();
+        });
+      }
     } else {
       stopLoop();
       setTimeout(function () { canvas.focus(); }, 650);
@@ -1092,6 +940,8 @@
 
   newMaze();
   tuneJump();
+  // the run needs its artwork before it can size anything, so load it up front
+  loadArt(function () { if (G) drawRun(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(); drawRun(); });
 })();
 </script>
