@@ -1120,7 +1120,7 @@ function Footer() {
         fontSize: 58, color: 'var(--camel)', lineHeight: 1, marginBottom: 14,
       }}>
         Erika{' '}
-        <a href="/maze.html" aria-label="A little detour" style={{ color: 'inherit', textDecoration: 'none' }}>&amp;</a>
+        <a href="/maze" aria-label="A little detour" style={{ color: 'inherit', textDecoration: 'none' }}>&amp;</a>
         {' '}Brendan
       </div>
       <div className="caps" style={{
