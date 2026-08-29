@@ -544,6 +544,40 @@
   var RUN_KEYS = ['run1','run2','run3','run4','run5','run6','run7','run8'];
   var artReady = false;
 
+  // ── Scenery, after the lake at Kawaguchiko: Fuji and the far shore on
+  //    the horizon, the town below it, then scrub and the path underfoot.
+  //    Each band scrolls at its own rate and picks from a pool, so the
+  //    view keeps changing as he runs.
+  var BG = {};
+  var BGDIR = 'background/';
+  var BGFILES = ['mountain_lake_backdrop','town_skyline','autumn_forest_row',
+    'shore_strip_01','shore_strip_02','water_rock_strip_03',
+    'pine_single','pines_group_01','pines_group_02','trees_green_pair',
+    'tree_autumn_large','bare_tree','bush_green','shrubs_small',
+    'bench','lamp_post','signpost','bridge_stone','bridge_wood',
+    'ground_strip_dirt','ground_strip_cobble',
+    'weeds_01','weeds_02','weeds_03','weeds_04','weeds_05','weeds_06',
+    'grass_tuft_dry','rock_small','rock_pair','boulder_group','log',
+    'cloud_01','cloud_02','cloud_03','cloud_04','cloud_05','cloud_06','cloud_07','cloud_08',
+    'birds_01','birds_02','birds_03','birds_04','birds_05','birds_06','birds_07','birds_08',
+    'sun_02'];
+
+  // No conifers here: the thing you jump is a green pine, and the scrub
+  // band must never offer anything that looks like one. Autumn suits the
+  // photograph anyway.
+  var MID_POOL  = ['tree_autumn_large','bare_tree','shrubs_small',
+                   'log','boulder_group','rock_pair'];
+  var RARE_POOL = ['bench','lamp_post','signpost','bridge_stone','bridge_wood'];
+  // Nothing below the path that could pass for an obstacle: small growth only.
+  var FORE_POOL = ['weeds_01','weeds_02','weeds_03','weeds_04','weeds_05','weeds_06',
+                   'grass_tuft_dry','rock_small'];
+  var CLOUDS    = ['cloud_01','cloud_02','cloud_03','cloud_04','cloud_05','cloud_06','cloud_07','cloud_08'];
+  var BIRDS     = ['birds_01','birds_02','birds_03','birds_04','birds_05','birds_06','birds_07','birds_08'];
+  var GROUNDS   = ['ground_strip_dirt'];   // the cobble reads too heavy under the scene
+
+  function pick(a) { return a[(Math.random() * a.length) | 0]; }
+  function horizon() { return R.ground - R.h * 0.17; }
+
   function trim(img) {
     var c = document.createElement('canvas');
     c.width = img.naturalWidth; c.height = img.naturalHeight;
@@ -569,7 +603,13 @@
   }
 
   function loadArt(done) {
-    var names = Object.keys(ARTFILES), left = names.length;
+    var names = Object.keys(ARTFILES), left = names.length + BGFILES.length;
+    BGFILES.forEach(function (n) {
+      var im = new Image();
+      im.onload = function () { BG[n] = trim(im); if (--left === 0) { artReady = true; done(); } };
+      im.onerror = function () { if (--left === 0) { artReady = true; done(); } };
+      im.src = BGDIR + n + '.png';
+    });
     if (!left) { done(); return; }
     names.forEach(function (n) {
       var img = new Image();
@@ -582,6 +622,56 @@
       };
       img.src = ARTFILES[n];
     });
+  }
+
+  // draw a scenery image by its base, left edge at x
+  function drawBG(key, x, baseY, h, flip, alpha) {
+    var im = BG[key];
+    if (!im) return;
+    var w = im.width * (h / im.height);
+    rx.imageSmoothingEnabled = true;
+    rx.imageSmoothingQuality = 'high';
+    if (alpha !== undefined) rx.globalAlpha = alpha;
+    if (flip) {
+      rx.save();
+      rx.translate(Math.round(x) + w, Math.round(baseY - h));
+      rx.scale(-1, 1);
+      rx.drawImage(im, 0, 0, w, h);
+      rx.restore();
+    } else {
+      rx.drawImage(im, Math.round(x), Math.round(baseY - h), w, h);
+    }
+    if (alpha !== undefined) rx.globalAlpha = 1;
+    return w;
+  }
+
+  // repeat an image across the width at a scroll offset
+  // These strips were cut from a sheet and do not tile edge to edge, so
+  // every second copy is mirrored: the touching columns then match and the
+  // join disappears. A couple of pixels of overlap covers the rounding.
+  function tileBG(key, off, baseY, h, alpha, mirror) {
+    var im = BG[key];
+    if (!im) return;
+    var w = im.width * (h / im.height);
+    if (w < 2) return;
+    rx.imageSmoothingEnabled = true;
+    rx.imageSmoothingQuality = 'high';
+    if (alpha !== undefined) rx.globalAlpha = alpha;
+    var idx0 = Math.floor(off / w);
+    var start = -(((off % w) + w) % w);
+    var i = 0;
+    for (var x = start; x < R.w; x += w, i++) {
+      if (mirror && ((((idx0 + i) % 2) + 2) % 2) === 1) {
+        rx.save();
+        rx.translate(x + w, baseY - h);
+        rx.scale(-1, 1);
+        rx.drawImage(im, 0, 0, w + 2, h);
+        rx.restore();
+      } else {
+        rx.drawImage(im, x, baseY - h, w + 2, h);
+      }
+    }
+    if (alpha !== undefined) rx.globalAlpha = 1;
   }
 
   // draw an image by its feet, centred on cx
@@ -635,15 +725,62 @@
       nextGap: R.w * 0.55,
       since: 0,
       erikaX: null,
-      hug: 0
+      hug: 0,
+      sky: { backdrop: 0, town: 0, forest: 0, shore: 0, ground: 0 },
+      clouds: [], birds: [], mid: [], fore: [],
+      nextMid: 0, nextFore: 0, nextBird: 0,
+      groundKey: pick(GROUNDS)
     };
-    for (var i = 0; i < 10; i++) {
-      G.pebbles.push({ x: Math.random() * R.w, w: 2 + Math.random() * 3 });
+    // seed the view so it does not start empty
+    for (var ci = 0; ci < 5; ci++) {
+      G.clouds.push({ x: Math.random() * R.w, y: R.h * (0.05 + Math.random() * 0.24),
+                      k: pick(CLOUDS), h: R.h * (0.05 + Math.random() * 0.05),
+                      a: 0.55 + Math.random() * 0.3 });
     }
+    for (var mi = 0; mi < 4; mi++) addMid(Math.random() * R.w);
+    for (var fi = 0; fi < 7; fi++) addFore(Math.random() * R.w);
+    G.nextMid = R.w * 0.3;
+    G.nextFore = R.w * 0.12;
+    G.nextBird = R.w * (2 + Math.random() * 3);
 
     winEl.classList.remove('show');
     overEl.classList.remove('show');
     drawRun();
+  }
+
+  // Scenery picks from a pool with jittered size, spacing and flip, so the
+  // same handful of assets does not read as a repeating strip.
+  // A prop's size follows how far down the scrub band it sits, so the
+  // nearer ones read as nearer. Everything stays clear of the path.
+  var MID_SIZE = {
+    pines_group_01: 0.155, pines_group_02: 0.155, pine_single: 0.125,
+    trees_green_pair: 0.13, tree_autumn_large: 0.125, bare_tree: 0.11,
+    shrubs_small: 0.05, log: 0.038, boulder_group: 0.05, rock_pair: 0.034,
+    bench: 0.055, lamp_post: 0.095, signpost: 0.07,
+    bridge_stone: 0.06, bridge_wood: 0.058
+  };
+
+  function addMid(x) {
+    var rare = Math.random() < 0.1;
+    var k = rare ? pick(RARE_POOL) : pick(MID_POOL);
+    var band = R.ground - horizon();
+    var t = Math.random();                       // 0 far, 1 near
+    G.mid.push({
+      x: x, k: k,
+      h: R.h * (MID_SIZE[k] || 0.08) * (0.72 + t * 0.55) * (0.85 + Math.random() * 0.3),
+      flip: !rare && Math.random() < 0.5,
+      drop: band * (0.15 + t * 0.55),            // never within reach of the path
+      a: 0.78 + t * 0.2
+    });
+  }
+
+  function addFore(x) {
+    G.fore.push({
+      x: x, k: pick(FORE_POOL),
+      h: R.h * (0.035 + Math.random() * 0.055),
+      flip: Math.random() < 0.5,
+      drop: R.h * (0.005 + Math.random() * 0.035)  // just below the path, nearest the eye
+    });
   }
 
   var GRAV, JUMPV;
@@ -685,10 +822,49 @@
     G.vy -= GRAV * dt;
     if (G.y < 0) { G.y = 0; G.vy = 0; }
 
-    // ground detail scrolls past
-    for (var i = 0; i < G.pebbles.length; i++) {
-      G.pebbles[i].x -= G.speed * dt;
-      if (G.pebbles[i].x < -8) { G.pebbles[i].x = R.w + Math.random() * 40; }
+    // every band at its own rate: the mountain barely moves, the weeds fly
+    var sp = G.speed * dt;
+    G.sky.backdrop += sp * 0.04;
+    G.sky.town     += sp * 0.16;
+    G.sky.forest   += sp * 0.28;
+    G.sky.shore    += sp * 0.42;
+    G.sky.ground   += sp;
+
+    for (var ci = G.clouds.length - 1; ci >= 0; ci--) {
+      var cl = G.clouds[ci];
+      cl.x -= sp * 0.05;
+      if (cl.x + R.w * 0.3 < 0) {
+        G.clouds.splice(ci, 1);
+        G.clouds.push({ x: R.w + Math.random() * R.w * 0.6,
+                        y: R.h * (0.05 + Math.random() * 0.24), k: pick(CLOUDS),
+                        h: R.h * (0.05 + Math.random() * 0.05),
+                        a: 0.55 + Math.random() * 0.3 });
+      }
+    }
+
+    G.nextBird -= sp;
+    if (G.nextBird <= 0) {
+      G.birds.push({ x: R.w + 20, y: R.h * (0.07 + Math.random() * 0.2),
+                     k: pick(BIRDS), h: R.h * (0.02 + Math.random() * 0.02) });
+      G.nextBird = R.w * (2.5 + Math.random() * 4);
+    }
+    for (var bi = G.birds.length - 1; bi >= 0; bi--) {
+      G.birds[bi].x -= sp * 0.22;
+      if (G.birds[bi].x < -60) G.birds.splice(bi, 1);
+    }
+
+    G.nextMid -= sp * 0.55;
+    if (G.nextMid <= 0) { addMid(R.w + 40); G.nextMid = R.w * (0.22 + Math.random() * 0.5); }
+    for (var mi = G.mid.length - 1; mi >= 0; mi--) {
+      G.mid[mi].x -= sp * 0.55;
+      if (G.mid[mi].x < -R.w * 0.4) G.mid.splice(mi, 1);
+    }
+
+    G.nextFore -= sp * 1.18;
+    if (G.nextFore <= 0) { addFore(R.w + 30); G.nextFore = R.w * (0.08 + Math.random() * 0.22); }
+    for (var fi = G.fore.length - 1; fi >= 0; fi--) {
+      G.fore[fi].x -= sp * 1.18;
+      if (G.fore[fi].x < -R.w * 0.3) G.fore.splice(fi, 1);
     }
 
     if (G.phase === 'run') {
@@ -746,11 +922,49 @@
   // ── Runner drawing ────────────────────────────────────────
   function drawRun() {
     rx.clearRect(0, 0, R.w, R.h);
-    rx.fillStyle = CREAM;
-    rx.fillRect(0, 0, R.w, R.h);
-    if (!G) return;
+    if (!G) { rx.fillStyle = CREAM; rx.fillRect(0, 0, R.w, R.h); return; }
 
-    // ground
+    var pan = G.pan || 0;
+    var hz = horizon();
+
+    // sky, dawn over the lake: pale blue lifting to warm at the horizon
+    var sky = rx.createLinearGradient(0, 0, 0, hz);
+    sky.addColorStop(0, '#D6E3EC');
+    sky.addColorStop(0.62, '#EDE9DF');
+    sky.addColorStop(1, '#F6F1E6');
+    rx.fillStyle = sky;
+    rx.fillRect(0, 0, R.w, hz);
+    // scrubland between the horizon and the path
+    rx.fillStyle = '#E9E2D2';
+    rx.fillRect(0, hz, R.w, R.ground - hz);
+
+    drawBG('sun_02', R.w * 0.60, R.h * 0.13, R.h * 0.10, false, 0.7);
+
+    for (var ci = 0; ci < G.clouds.length; ci++) {
+      var cl = G.clouds[ci];
+      drawBG(cl.k, cl.x + pan * 0.05, cl.y, cl.h, false, cl.a);
+    }
+    for (var bi = 0; bi < G.birds.length; bi++) {
+      var bd = G.birds[bi];
+      drawBG(bd.k, bd.x + pan * 0.22, bd.y, bd.h, false, 0.5);
+    }
+
+    // Fuji and the far shore, then the town, then the treeline
+    tileBG('mountain_lake_backdrop', G.sky.backdrop - pan * 0.04, hz + R.h * 0.012, R.h * 0.62, 0.95, true);
+    tileBG('town_skyline',           G.sky.town     - pan * 0.16, hz + R.h * 0.028, R.h * 0.055, 0.85, true);
+    tileBG('autumn_forest_row',      G.sky.forest   - pan * 0.28, hz + R.h * 0.062, R.h * 0.075, 0.9, true);
+    tileBG('shore_strip_01',         G.sky.shore    - pan * 0.42, hz + R.h * 0.105, R.h * 0.05, 0.9, true);
+
+    // scrub between the horizon and the path
+    for (var mi = 0; mi < G.mid.length; mi++) {
+      var m = G.mid[mi];
+      drawBG(m.k, m.x + pan * 0.55, hz + m.drop, m.h, m.flip, m.a);
+    }
+
+    // the path underfoot, on an earth fill so tile joins never show through
+    rx.fillStyle = '#7A5B37';
+    rx.fillRect(0, R.ground, R.w, R.h - R.ground);
+    tileBG(G.groundKey, G.sky.ground - pan, R.h + 2, R.h - R.ground + 2, 1, true);
     rx.strokeStyle = WALL;
     rx.lineWidth = Math.max(1.5, R.h * 0.0045);
     rx.lineCap = 'round';
@@ -759,18 +973,12 @@
     rx.lineTo(R.w, R.ground);
     rx.stroke();
 
-    // scrolling grit under the line
-    rx.strokeStyle = SOFT;
-    rx.lineWidth = Math.max(1, R.h * 0.0025);
-    var pan = G.pan || 0;
-    rx.beginPath();
-    for (var i = 0; i < G.pebbles.length; i++) {
-      var p = G.pebbles[i];
-      var py = R.ground + R.h * 0.028 + (i % 3) * R.h * 0.016;
-      rx.moveTo(p.x + pan, py);
-      rx.lineTo(p.x + p.w + pan, py);
+    // weeds and stones nearest the eye, below the path so they cannot be
+    // mistaken for something to jump
+    for (var fi = 0; fi < G.fore.length; fi++) {
+      var fo = G.fore[fi];
+      drawBG(fo.k, fo.x + pan * 1.18, R.ground + fo.drop + R.h * 0.012, fo.h, fo.flip, 1);
     }
-    rx.stroke();
 
     for (var j = 0; j < G.obstacles.length; j++) drawObstacle(G.obstacles[j]);
 
@@ -1020,6 +1228,19 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(relayout, 150);
   });
+
+  // Read-only view of the run, so the game can be exercised by a script
+  // without guessing at pixels now that there is scenery behind it.
+  window.__runState = function () {
+    if (!G) return null;
+    return {
+      phase: G.phase, score: G.score, x: G.x, y: G.y,
+      ground: R.ground, figH: R.figH, w: R.w, speed: G.speed,
+      obstacles: G.obstacles.map(function (o) {
+        return { x: o.x, w: o.w, h: o.h, cw: o.cw };
+      })
+    };
+  };
 
   newMaze();
   tuneJump();
