@@ -60,6 +60,9 @@
     max-width: 430px;
     margin: 24px auto 0;
   }
+  /* the header text cross-fades when the games swap */
+  .fade { transition: opacity .28s ease; }
+  .fade.out { opacity: 0; }
 
   .board {
     margin: 40px auto 0;
@@ -69,12 +72,21 @@
     display: inline-block;
     line-height: 0;
   }
+  /* the two games sit side by side and slide across */
+  .stage { overflow: hidden; }
+  .track {
+    display: flex;
+    width: 200%;
+    transition: transform .65s cubic-bezier(.7, 0, .2, 1);
+  }
+  .panel { width: 50%; flex: 0 0 50%; }
   canvas {
     touch-action: none;
-    cursor: crosshair;
     outline: none;
     display: block;
   }
+  #maze { cursor: crosshair; }
+  #run { cursor: pointer; }
   canvas:focus-visible { box-shadow: 0 0 0 2px var(--camel); }
 
   .hint {
@@ -107,10 +119,21 @@
     color: var(--ink-soft);
   }
 
+  /* a loss gets a quieter note, not the big script */
+  .over { display: none; margin-top: 26px; }
+  .over.show { display: block; animation: rise .4s ease both; }
+  .over span {
+    font-family: 'Bellefair', serif;
+    font-style: italic;
+    font-size: clamp(18px, 2.4vw, 22px);
+    color: var(--ink-soft);
+  }
+
   .controls {
     margin-top: 34px;
     display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
   }
+  .controls[hidden] { display: none; }
   button {
     font-family: 'Jost', sans-serif;
     font-size: 10px;
@@ -146,28 +169,45 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="eyebrow">a little detour</div>
-    <h1>Find each other</h1>
+    <div class="eyebrow fade" id="eyebrow">a little detour</div>
+    <h1 class="fade" id="title">Find each other</h1>
     <div class="rule"></div>
-    <p class="lede">
+    <p class="lede fade" id="lede">
       Erika is at one end and Brendan is at the other.
       Draw the line that brings them together.
     </p>
 
     <div class="board">
-      <canvas id="maze" tabindex="0" aria-label="Maze puzzle: draw a path from Erika to Brendan"></canvas>
+      <div class="stage" id="stage">
+        <div class="track" id="track">
+          <div class="panel">
+            <canvas id="maze" tabindex="0" aria-label="Maze puzzle: draw a path from Erika to Brendan"></canvas>
+          </div>
+          <div class="panel">
+            <canvas id="run" tabindex="0" aria-label="Running game: jump Brendan over obstacles to reach Erika"></canvas>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <p class="hint">Drag from <b>E</b> to <b>B</b><span class="kb"> &nbsp;·&nbsp; arrow keys work too</span></p>
+    <p class="hint fade" id="hint">Drag from <b>E</b> to <b>B</b><span class="kb"> &nbsp;·&nbsp; arrow keys work too</span></p>
 
     <div class="win" id="win">
-      <div class="line">you found each other</div>
+      <div class="line" id="winLine">you found each other</div>
       <div class="time" id="time"></div>
     </div>
 
-    <div class="controls">
+    <div class="over" id="over"><span id="overText"></span></div>
+
+    <div class="controls" id="mazeControls">
       <button id="newBtn">New maze</button>
       <button id="clearBtn">Clear the line</button>
+      <button id="nextBtn">Next game</button>
+    </div>
+
+    <div class="controls" id="runControls" hidden>
+      <button id="restartBtn">Run again</button>
+      <button id="backBtn">Back to the maze</button>
     </div>
 
     <a class="back" href="/">&larr; back to the wedding</a>
@@ -177,15 +217,22 @@
 (function () {
   var CREAM = '#FBFAF7';
   var WALL  = 'oklch(0.22 0.015 50)';
-  var CAMEL = 'oklch(0.62 0.09 55)';
-  var DUSK  = 'oklch(0.42 0.035 240)';
+  var SOFT  = 'oklch(0.42 0.02 50)';
+  var CAMEL = 'oklch(0.62 0.09 55)';   // Erika
+  var DUSK  = 'oklch(0.42 0.035 240)'; // Brendan
 
   var canvas = document.getElementById('maze');
   var ctx = canvas.getContext('2d');
   var winEl = document.getElementById('win');
+  var winLine = document.getElementById('winLine');
   var timeEl = document.getElementById('time');
+  var overEl = document.getElementById('over');
+  var overText = document.getElementById('overText');
+  var track = document.getElementById('track');
+  var stage = document.getElementById('stage');
 
   var cols, rows, cell, cells, path, dragging, won, startedAt, elapsed;
+  var current = 'maze';
 
   // ── Maze generation (recursive backtracker → a perfect maze,
   //    so exactly one route joins any two cells) ───────────────
@@ -236,13 +283,13 @@
   function startCell() { return { x: 0, y: 0 }; }
   function endCell()   { return { x: cols - 1, y: rows - 1 }; }
 
-  // ── Sizing ────────────────────────────────────────────────
+  // ── Sizing (both games share one frame so the swipe is seamless) ──
   function layout() {
     var portrait = window.innerWidth < 620;
     cols = portrait ? 11 : 17;
     rows = portrait ? 15 : 12;
 
-    var board = canvas.parentNode;
+    var board = canvas.closest('.board');
     var pad = portrait ? 20 : 32;
     var availW = Math.min(board.parentNode.clientWidth, 660) - pad;
     var availH = Math.max(300, window.innerHeight - 340);
@@ -257,9 +304,13 @@
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    stage.style.width = w + 'px';
+    stage.style.height = h + 'px';
+    runLayout(w, h, dpr);
   }
 
-  // ── Drawing ───────────────────────────────────────────────
+  // ── Maze drawing ──────────────────────────────────────────
   function centre(p) {
     return { x: p.x * cell + cell / 2, y: p.y * cell + cell / 2 };
   }
@@ -323,7 +374,7 @@
     ctx.fillText(letter, c.x, c.y + cell * 0.02);
   }
 
-  // ── Path logic ────────────────────────────────────────────
+  // ── Maze path logic ───────────────────────────────────────
   function same(a, b) { return a && b && a.x === b.x && a.y === b.y; }
 
   function canStep(from, to) {
@@ -362,6 +413,7 @@
   function finish() {
     won = true;
     elapsed = startedAt ? Math.round((Date.now() - startedAt) / 1000) : 0;
+    winLine.textContent = 'you found each other';
     if (elapsed < 60) {
       timeEl.textContent = 'in ' + elapsed + (elapsed === 1 ? ' second' : ' seconds');
     } else {
@@ -379,7 +431,7 @@
     return { x: x, y: y };
   }
 
-  // ── Input ─────────────────────────────────────────────────
+  // ── Maze input ────────────────────────────────────────────
   canvas.addEventListener('pointerdown', function (e) {
     if (won) return;
     var c = cellAt(e);
@@ -433,7 +485,6 @@
     step({ x: last.x + d.dx, y: last.y + d.dy });
   });
 
-  // ── Reset / resize ────────────────────────────────────────
   function clearLine() {
     path = [startCell()];
     won = false;
@@ -449,8 +500,425 @@
     clearLine();
   }
 
+  // ══════════════════════════════════════════════════════════
+  // THE RUN — Brendan covers a hundred to reach Erika
+  // ══════════════════════════════════════════════════════════
+  var rc = document.getElementById('run');
+  var rx = rc.getContext('2d');
+  var R = { w: 0, h: 0, ground: 0, figH: 0 };
+  var G = null;      // game state
+  var raf = null;
+  var lastT = 0;
+
+  function runLayout(w, h, dpr) {
+    rc.style.width = w + 'px';
+    rc.style.height = h + 'px';
+    rc.width = Math.round(w * dpr);
+    rc.height = Math.round(h * dpr);
+    rx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    R.w = w; R.h = h;
+    R.ground = h * 0.82;
+    R.figH = h * 0.21;
+    if (G) { G.y = Math.min(G.y, 0); drawRun(); }
+  }
+
+  function newGame() {
+    G = {
+      phase: 'run',            // run → meet → won | over
+      x: R.w * 0.16,
+      y: 0,                    // height above ground (positive = airborne)
+      vy: 0,
+      speed: R.w * 0.0072,
+      score: 0,
+      t: 0,                    // stride phase
+      obstacles: [],
+      pebbles: [],
+      nextGap: R.w * 0.55,
+      since: 0,
+      erikaX: null,
+      hug: 0
+    };
+    for (var i = 0; i < 22; i++) {
+      G.pebbles.push({ x: Math.random() * R.w, w: 2 + Math.random() * 5 });
+    }
+    winEl.classList.remove('show');
+    overEl.classList.remove('show');
+    drawRun();
+  }
+
+  var GRAV, JUMPV;
+  function tuneJump() {
+    GRAV  = R.h * 0.0016;
+    // Airtime, not height, is what makes this fair: it has to stay long enough
+    // that landing clears an obstacle's trailing edge, which leaves roughly a
+    // third of a second to time each jump.
+    JUMPV = R.h * 0.035;
+  }
+
+  function jump() {
+    if (!G) return;
+    if (G.phase === 'over') { newGame(); loop(); return; }
+    if (G.phase !== 'run' && G.phase !== 'meet') return;
+    if (G.y <= 0.01) { G.vy = JUMPV; }
+  }
+
+  function spawn() {
+    // every obstacle is clearable: heights stay well under the jump apex
+    var tall = Math.random() < 0.35;
+    var oh = R.figH * (tall ? 0.72 : 0.46);
+    var ow = R.figH * (tall ? 0.34 : 0.46);
+    G.obstacles.push({ x: R.w + ow, w: ow, h: oh, tall: tall });
+  }
+
+  function tick(dt) {
+    if (G.phase === 'over' || G.phase === 'won') return;
+
+    G.t += dt * 0.32;
+
+    // vertical motion
+    G.y += G.vy * dt;
+    G.vy -= GRAV * dt;
+    if (G.y < 0) { G.y = 0; G.vy = 0; }
+
+    // ground detail scrolls past
+    for (var i = 0; i < G.pebbles.length; i++) {
+      G.pebbles[i].x -= G.speed * dt;
+      if (G.pebbles[i].x < -8) { G.pebbles[i].x = R.w + Math.random() * 40; }
+    }
+
+    if (G.phase === 'run') {
+      G.score += (G.speed * dt) / (R.w * 0.0755);
+      G.speed += R.w * 0.0000045 * dt;         // a gentle build
+
+      G.since += G.speed * dt;
+      if (G.since > G.nextGap) {
+        spawn();
+        G.since = 0;
+        // spacing scales with speed so the gap stays jumpable
+        G.nextGap = G.speed * (72 + Math.random() * 62);
+      }
+
+      if (G.score >= 100) {
+        G.score = 100;
+        G.phase = 'meet';
+        G.erikaX = R.w + R.figH * 1.2;
+        // clear anything still between them
+        G.obstacles = G.obstacles.filter(function (o) { return o.x < G.x; });
+      }
+    }
+
+    // move obstacles, test collision
+    for (var j = G.obstacles.length - 1; j >= 0; j--) {
+      var o = G.obstacles[j];
+      o.x -= G.speed * dt;
+      if (o.x + o.w < -10) { G.obstacles.splice(j, 1); continue; }
+      if (hits(o)) { G.phase = 'over'; showOver(); return; }
+    }
+
+    if (G.phase === 'meet') {
+      G.erikaX -= G.speed * dt;
+      if (G.erikaX - G.x <= R.figH * 0.62) {
+        G.erikaX = G.x + R.figH * 0.62;
+        G.y = 0; G.vy = 0;
+        G.phase = 'won';
+        showWon();
+      }
+    }
+  }
+
+  function hits(o) {
+    var half = R.figH * 0.17;                 // forgiving body width
+    var feet = R.ground - G.y;
+    var bodyTop = feet - R.figH * 0.92;
+    var oTop = R.ground - o.h;
+    var overlapX = (G.x + half > o.x) && (G.x - half < o.x + o.w);
+    var overlapY = bodyTop < R.ground && feet > oTop;
+    return overlapX && overlapY;
+  }
+
+  // ── Runner drawing ────────────────────────────────────────
+  function drawRun() {
+    rx.clearRect(0, 0, R.w, R.h);
+    rx.fillStyle = CREAM;
+    rx.fillRect(0, 0, R.w, R.h);
+    if (!G) return;
+
+    // ground
+    rx.strokeStyle = WALL;
+    rx.lineWidth = Math.max(1.5, R.h * 0.0045);
+    rx.lineCap = 'round';
+    rx.beginPath();
+    rx.moveTo(0, R.ground);
+    rx.lineTo(R.w, R.ground);
+    rx.stroke();
+
+    // scrolling grit under the line
+    rx.strokeStyle = SOFT;
+    rx.lineWidth = Math.max(1, R.h * 0.0025);
+    var pan = G.pan || 0;
+    rx.beginPath();
+    for (var i = 0; i < G.pebbles.length; i++) {
+      var p = G.pebbles[i];
+      var py = R.ground + R.h * 0.028 + (i % 3) * R.h * 0.016;
+      rx.moveTo(p.x + pan, py);
+      rx.lineTo(p.x + p.w + pan, py);
+    }
+    rx.stroke();
+
+    for (var j = 0; j < G.obstacles.length; j++) drawObstacle(G.obstacles[j]);
+
+    var feet = R.ground - G.y;
+    if (G.phase === 'won') {
+      drawEmbrace();
+    } else {
+      drawBrendan(G.x, feet, G.y > 0.5);
+      if (G.erikaX !== null) drawErika(G.erikaX, R.ground, true);
+    }
+
+    drawScore();
+  }
+
+  function drawObstacle(o) {
+    rx.strokeStyle = WALL;
+    rx.lineWidth = Math.max(1.5, R.figH * 0.075);
+    rx.lineCap = 'round';
+    var base = R.ground;
+    if (o.tall) {
+      // a slim shrub
+      rx.beginPath();
+      rx.moveTo(o.x + o.w / 2, base);
+      rx.lineTo(o.x + o.w / 2, base - o.h);
+      rx.stroke();
+      rx.beginPath();
+      rx.arc(o.x + o.w / 2, base - o.h, o.w * 0.62, Math.PI * 0.15, Math.PI * 0.85, true);
+      rx.stroke();
+    } else {
+      // a tuft of grass
+      for (var k = -1; k <= 1; k++) {
+        rx.beginPath();
+        rx.moveTo(o.x + o.w / 2, base);
+        rx.quadraticCurveTo(
+          o.x + o.w / 2 + k * o.w * 0.42, base - o.h * 0.55,
+          o.x + o.w / 2 + k * o.w * 0.62, base - o.h
+        );
+        rx.stroke();
+      }
+    }
+  }
+
+  function drawBrendan(x, feetY, airborne) {
+    var h = R.figH;
+    var lw = Math.max(2, h * 0.105);
+    rx.strokeStyle = DUSK; rx.fillStyle = DUSK;
+    rx.lineWidth = lw; rx.lineCap = 'round'; rx.lineJoin = 'round';
+
+    var headR = h * 0.15;
+    var headY = feetY - h + headR;
+    var hipY = feetY - h * 0.42;
+    var shoulderY = feetY - h * 0.76;
+
+    rx.beginPath(); rx.arc(x, headY, headR, 0, Math.PI * 2); rx.fill();
+    rx.beginPath(); rx.moveTo(x, headY + headR); rx.lineTo(x, hipY); rx.stroke();
+
+    var a = airborne ? 0.9 : Math.sin(G.t);
+    var b = airborne ? -0.5 : Math.sin(G.t + Math.PI);
+
+    // legs
+    rx.beginPath(); rx.moveTo(x, hipY);
+    rx.lineTo(x + a * h * 0.26, airborne ? feetY - h * 0.10 : feetY); rx.stroke();
+    rx.beginPath(); rx.moveTo(x, hipY);
+    rx.lineTo(x + b * h * 0.26, airborne ? feetY - h * 0.04 : feetY); rx.stroke();
+    // arms
+    rx.beginPath(); rx.moveTo(x, shoulderY);
+    rx.lineTo(x + b * h * 0.22, shoulderY + h * 0.24); rx.stroke();
+    rx.beginPath(); rx.moveTo(x, shoulderY);
+    rx.lineTo(x + a * h * 0.22, shoulderY + h * 0.24); rx.stroke();
+  }
+
+  function drawErika(x, feetY, waving) {
+    var h = R.figH;
+    var lw = Math.max(2, h * 0.105);
+    rx.strokeStyle = CAMEL; rx.fillStyle = CAMEL;
+    rx.lineWidth = lw; rx.lineCap = 'round'; rx.lineJoin = 'round';
+
+    var headR = h * 0.15;
+    var headY = feetY - h + headR;
+    var hemY = feetY - h * 0.12;
+
+    rx.beginPath(); rx.arc(x, headY, headR, 0, Math.PI * 2); rx.fill();
+    rx.beginPath(); rx.arc(x + headR * 0.92, headY - headR * 0.45, headR * 0.55, 0, Math.PI * 2); rx.fill();
+
+    // a simple A-line dress
+    rx.beginPath();
+    rx.moveTo(x, headY + headR * 0.5);
+    rx.lineTo(x - h * 0.19, hemY);
+    rx.lineTo(x + h * 0.19, hemY);
+    rx.closePath();
+    rx.fill();
+
+    rx.beginPath(); rx.moveTo(x - h * 0.06, hemY); rx.lineTo(x - h * 0.06, feetY); rx.stroke();
+    rx.beginPath(); rx.moveTo(x + h * 0.06, hemY); rx.lineTo(x + h * 0.06, feetY); rx.stroke();
+
+    // an arm out toward him
+    var lift = waving ? Math.sin(G.t * 0.8) * h * 0.06 : 0;
+    rx.beginPath();
+    rx.moveTo(x - h * 0.05, feetY - h * 0.72);
+    rx.lineTo(x - h * 0.30, feetY - h * 0.60 + lift);
+    rx.stroke();
+  }
+
+  function drawEmbrace() {
+    var h = R.figH;
+    var cx = (G.x + G.erikaX) / 2 + (G.pan || 0);
+    var gap = h * 0.30;
+    var feetY = R.ground;
+
+    // both lean in, arms across each other
+    drawBrendan(cx - gap, feetY, false);
+    drawErika(cx + gap, feetY, false);
+
+    rx.lineCap = 'round';
+    rx.lineWidth = Math.max(2, h * 0.105);
+    // his arm around her
+    rx.strokeStyle = DUSK;
+    rx.beginPath();
+    rx.moveTo(cx - gap, feetY - h * 0.76);
+    rx.lineTo(cx + gap * 0.85, feetY - h * 0.66);
+    rx.stroke();
+    // hers around him
+    rx.strokeStyle = CAMEL;
+    rx.beginPath();
+    rx.moveTo(cx + gap, feetY - h * 0.72);
+    rx.lineTo(cx - gap * 0.85, feetY - h * 0.60);
+    rx.stroke();
+  }
+
+  function drawScore() {
+    rx.fillStyle = SOFT;
+    rx.font = '500 ' + Math.round(R.h * 0.032) + "px 'Jost', sans-serif";
+    rx.textAlign = 'right';
+    rx.textBaseline = 'top';
+    var s = Math.floor(G.score);
+    rx.fillText(s + ' / 100', R.w - R.h * 0.035, R.h * 0.035);
+  }
+
+  function showWon() {
+    stopLoop();
+    // ease the pair into the middle of the frame for the moment itself
+    var shift = R.w * 0.5 - (G.x + G.erikaX) / 2;
+    var t0 = performance.now();
+    (function pan(now) {
+      var k = Math.min(1, (now - t0) / 600);
+      G.pan = shift * (1 - Math.pow(1 - k, 3));
+      drawRun();
+      if (k < 1) requestAnimationFrame(pan);
+    })(performance.now());
+    winLine.textContent = 'and there she was';
+    timeEl.textContent = 'a hundred out of a hundred';
+    winEl.classList.add('show');
+  }
+
+  function showOver() {
+    stopLoop();
+    drawRun();
+    overText.textContent = 'Tripped at ' + Math.floor(G.score) + '. She is still waiting.';
+    overEl.classList.add('show');
+  }
+
+  function loop() {
+    stopLoop();
+    lastT = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+
+  function frame(now) {
+    var dt = Math.min(2.5, (now - lastT) / 16.667);
+    lastT = now;
+    tick(dt);
+    drawRun();
+    if (G && (G.phase === 'run' || G.phase === 'meet')) {
+      raf = requestAnimationFrame(frame);
+    } else {
+      raf = null;
+    }
+  }
+
+  function stopLoop() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+  }
+
+  rc.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    rc.focus();
+    jump();
+  });
+  rc.addEventListener('keydown', function (e) {
+    if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'ArrowUp' || e.key === 'Enter') {
+      e.preventDefault();
+      jump();
+    }
+  });
+
+  // ── Swapping between the two ──────────────────────────────
+  var COPY = {
+    maze: {
+      eyebrow: 'a little detour',
+      title: 'Find each other',
+      lede: 'Erika is at one end and Brendan is at the other. Draw the line that brings them together.',
+      hint: 'Drag from <b>E</b> to <b>B</b><span class="kb"> &nbsp;·&nbsp; arrow keys work too</span>'
+    },
+    run: {
+      eyebrow: 'one more thing',
+      title: 'Run to her',
+      lede: 'Erika is waiting at a hundred. Get Brendan over everything in the way.',
+      hint: 'Tap, or press space, to jump'
+    }
+  };
+
+  function setCopy(which) {
+    var els = [document.getElementById('eyebrow'), document.getElementById('title'),
+               document.getElementById('lede'), document.getElementById('hint')];
+    els.forEach(function (el) { el.classList.add('out'); });
+    setTimeout(function () {
+      document.getElementById('eyebrow').textContent = COPY[which].eyebrow;
+      document.getElementById('title').textContent = COPY[which].title;
+      document.getElementById('lede').textContent = COPY[which].lede;
+      document.getElementById('hint').innerHTML = COPY[which].hint;
+      els.forEach(function (el) { el.classList.remove('out'); });
+    }, 280);
+  }
+
+  function goTo(which) {
+    if (current === which) return;
+    current = which;
+    winEl.classList.remove('show');
+    overEl.classList.remove('show');
+    setCopy(which);
+    track.style.transform = which === 'run' ? 'translateX(-50%)' : 'translateX(0)';
+    document.getElementById('mazeControls').hidden = (which === 'run');
+    document.getElementById('runControls').hidden = (which !== 'run');
+
+    if (which === 'run') {
+      tuneJump();
+      newGame();
+      setTimeout(function () { rc.focus(); loop(); }, 650);
+    } else {
+      stopLoop();
+      setTimeout(function () { canvas.focus(); }, 650);
+    }
+  }
+
   document.getElementById('newBtn').addEventListener('click', newMaze);
   document.getElementById('clearBtn').addEventListener('click', clearLine);
+  document.getElementById('nextBtn').addEventListener('click', function () { goTo('run'); });
+  document.getElementById('backBtn').addEventListener('click', function () { goTo('maze'); });
+  document.getElementById('restartBtn').addEventListener('click', function () {
+    winEl.classList.remove('show');
+    overEl.classList.remove('show');
+    newGame();
+    rc.focus();
+    loop();
+  });
 
   var resizeTimer;
   window.addEventListener('resize', function () {
@@ -458,14 +926,16 @@
     resizeTimer = setTimeout(function () {
       var prevCols = cols, prevRows = rows;
       layout();
-      // a different grid needs a different maze; otherwise keep the one in play
+      tuneJump();
       if (cols !== prevCols || rows !== prevRows) { generate(); clearLine(); }
       else draw();
+      if (G) { G.x = R.w * 0.16; drawRun(); }
     }, 150);
   });
 
   newMaze();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  tuneJump();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(); drawRun(); });
 })();
 </script>
 </body>
