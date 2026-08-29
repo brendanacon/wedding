@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Find each other · Erika &amp; Brendan</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bellefair&family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FBFAF7;
+    --cream-deep: #F2EEE6;
+    --ink: oklch(0.22 0.015 50);
+    --ink-soft: oklch(0.42 0.02 50);
+    --camel: oklch(0.62 0.09 55);
+    --camel-deep: oklch(0.48 0.08 50);
+    --dusk: oklch(0.42 0.035 240);
+    --hairline: #E6E1D7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Jost', system-ui, sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding: 56px 24px 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .wrap { width: 100%; max-width: 660px; text-align: center; }
+
+  .eyebrow {
+    font-family: 'Mrs Saint Delafield', cursive;
+    font-size: 44px; line-height: 1;
+    color: var(--camel);
+    margin-bottom: 6px;
+  }
+  h1 {
+    font-family: 'Bellefair', serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: clamp(30px, 6vw, 50px);
+    font-weight: 400;
+    line-height: 1.05;
+  }
+  .rule { width: 36px; height: 1px; background: var(--camel); margin: 22px auto 0; }
+  .lede {
+    font-family: 'Bellefair', serif;
+    font-style: italic;
+    font-size: clamp(17px, 2.4vw, 21px);
+    color: var(--ink-soft);
+    line-height: 1.55;
+    max-width: 430px;
+    margin: 24px auto 0;
+  }
+
+  .board {
+    margin: 40px auto 0;
+    padding: 16px;
+    background: var(--cream-deep);
+    border: 1px solid var(--hairline);
+    display: inline-block;
+    line-height: 0;
+  }
+  canvas {
+    touch-action: none;
+    cursor: crosshair;
+    outline: none;
+    display: block;
+  }
+  canvas:focus-visible { box-shadow: 0 0 0 2px var(--camel); }
+
+  .hint {
+    margin-top: 22px;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .hint b { font-weight: 500; color: var(--ink); }
+
+  /* display:none keeps it from reserving space; the keyframe still animates it in */
+  .win { display: none; margin-top: 30px; pointer-events: none; }
+  .win.show { display: block; animation: rise .55s ease both; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .win .line {
+    font-family: 'Mrs Saint Delafield', cursive;
+    font-size: clamp(46px, 8.5vw, 64px);
+    line-height: 1.1;
+    color: var(--camel);
+  }
+  .win .time {
+    margin-top: 10px;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .controls {
+    margin-top: 34px;
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+  button {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    padding: 13px 26px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--hairline);
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  button:hover { border-color: var(--camel); color: var(--camel-deep); }
+
+  .back {
+    display: inline-block;
+    margin-top: 48px;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .back:hover { color: var(--camel); }
+
+  @media (max-width: 560px) {
+    body { padding: 40px 16px 56px; }
+    .board { padding: 10px; }
+    .kb { display: none; }   /* no arrow keys on a phone */
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">a little detour</div>
+    <h1>Find each other</h1>
+    <div class="rule"></div>
+    <p class="lede">
+      Erika is at one end and Brendan is at the other.
+      Draw the line that brings them together.
+    </p>
+
+    <div class="board">
+      <canvas id="maze" tabindex="0" aria-label="Maze puzzle: draw a path from Erika to Brendan"></canvas>
+    </div>
+
+    <p class="hint">Drag from <b>E</b> to <b>B</b><span class="kb"> &nbsp;·&nbsp; arrow keys work too</span></p>
+
+    <div class="win" id="win">
+      <div class="line">you found each other</div>
+      <div class="time" id="time"></div>
+    </div>
+
+    <div class="controls">
+      <button id="newBtn">New maze</button>
+      <button id="clearBtn">Clear the line</button>
+    </div>
+
+    <a class="back" href="/">&larr; back to the wedding</a>
+  </div>
+
+<script>
+(function () {
+  var CREAM = '#FBFAF7';
+  var WALL  = 'oklch(0.22 0.015 50)';
+  var CAMEL = 'oklch(0.62 0.09 55)';
+  var DUSK  = 'oklch(0.42 0.035 240)';
+
+  var canvas = document.getElementById('maze');
+  var ctx = canvas.getContext('2d');
+  var winEl = document.getElementById('win');
+  var timeEl = document.getElementById('time');
+
+  var cols, rows, cell, cells, path, dragging, won, startedAt, elapsed;
+
+  // ── Maze generation (recursive backtracker → a perfect maze,
+  //    so exactly one route joins any two cells) ───────────────
+  // walls: [top, right, bottom, left]
+  var DIRS = [
+    { dx: 0, dy: -1, wall: 0, opp: 2 },
+    { dx: 1, dy: 0,  wall: 1, opp: 3 },
+    { dx: 0, dy: 1,  wall: 2, opp: 0 },
+    { dx: -1, dy: 0, wall: 3, opp: 1 }
+  ];
+
+  function generate() {
+    cells = [];
+    for (var y = 0; y < rows; y++) {
+      for (var x = 0; x < cols; x++) {
+        cells.push({ x: x, y: y, walls: [true, true, true, true], seen: false });
+      }
+    }
+    var stack = [];
+    var current = cells[0];
+    current.seen = true;
+    var visited = 1;
+    var total = cols * rows;
+
+    while (visited < total) {
+      var options = [];
+      for (var i = 0; i < DIRS.length; i++) {
+        var d = DIRS[i];
+        var nx = current.x + d.dx, ny = current.y + d.dy;
+        if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+        var n = cells[ny * cols + nx];
+        if (!n.seen) options.push({ cell: n, wall: d.wall, opp: d.opp });
+      }
+      if (options.length) {
+        var pick = options[(Math.random() * options.length) | 0];
+        current.walls[pick.wall] = false;
+        pick.cell.walls[pick.opp] = false;
+        stack.push(current);
+        current = pick.cell;
+        current.seen = true;
+        visited++;
+      } else {
+        current = stack.pop();
+      }
+    }
+  }
+
+  function startCell() { return { x: 0, y: 0 }; }
+  function endCell()   { return { x: cols - 1, y: rows - 1 }; }
+
+  // ── Sizing ────────────────────────────────────────────────
+  function layout() {
+    var portrait = window.innerWidth < 620;
+    cols = portrait ? 11 : 17;
+    rows = portrait ? 15 : 12;
+
+    var board = canvas.parentNode;
+    var pad = portrait ? 20 : 32;
+    var availW = Math.min(board.parentNode.clientWidth, 660) - pad;
+    var availH = Math.max(300, window.innerHeight - 340);
+
+    cell = Math.floor(Math.min(availW / cols, availH / rows));
+    cell = Math.max(cell, 18);
+
+    var w = cell * cols, h = cell * rows;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // ── Drawing ───────────────────────────────────────────────
+  function centre(p) {
+    return { x: p.x * cell + cell / 2, y: p.y * cell + cell / 2 };
+  }
+
+  function draw() {
+    var w = cell * cols, h = cell * rows;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = CREAM;
+    ctx.fillRect(0, 0, w, h);
+
+    // the drawn line, camel at Erika's end fading to dusk at Brendan's
+    if (path.length > 1) {
+      var a = centre(startCell()), b = centre(endCell());
+      var grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+      grad.addColorStop(0, CAMEL);
+      grad.addColorStop(1, DUSK);
+      ctx.beginPath();
+      for (var i = 0; i < path.length; i++) {
+        var c = centre(path[i]);
+        if (i === 0) ctx.moveTo(c.x, c.y); else ctx.lineTo(c.x, c.y);
+      }
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = Math.max(4, cell * 0.34);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.globalAlpha = won ? 1 : 0.75;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // walls
+    ctx.strokeStyle = WALL;
+    ctx.lineWidth = Math.max(1.5, cell * 0.075);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (var j = 0; j < cells.length; j++) {
+      var c2 = cells[j];
+      var x = c2.x * cell, y = c2.y * cell;
+      if (c2.walls[0]) { ctx.moveTo(x, y); ctx.lineTo(x + cell, y); }
+      if (c2.walls[3]) { ctx.moveTo(x, y); ctx.lineTo(x, y + cell); }
+      if (c2.x === cols - 1 && c2.walls[1]) { ctx.moveTo(x + cell, y); ctx.lineTo(x + cell, y + cell); }
+      if (c2.y === rows - 1 && c2.walls[2]) { ctx.moveTo(x, y + cell); ctx.lineTo(x + cell, y + cell); }
+    }
+    ctx.stroke();
+
+    marker(startCell(), 'E', CAMEL);
+    marker(endCell(), 'B', DUSK);
+  }
+
+  function marker(p, letter, colour) {
+    var c = centre(p);
+    var r = cell * 0.33;
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = colour;
+    ctx.fill();
+    ctx.fillStyle = CREAM;
+    ctx.font = '400 ' + Math.round(cell * 0.42) + "px 'Bellefair', serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(letter, c.x, c.y + cell * 0.02);
+  }
+
+  // ── Path logic ────────────────────────────────────────────
+  function same(a, b) { return a && b && a.x === b.x && a.y === b.y; }
+
+  function canStep(from, to) {
+    var dx = to.x - from.x, dy = to.y - from.y;
+    if (Math.abs(dx) + Math.abs(dy) !== 1) return false;
+    var c = cells[from.y * cols + from.x];
+    if (dx === 1)  return !c.walls[1];
+    if (dx === -1) return !c.walls[3];
+    if (dy === 1)  return !c.walls[2];
+    return !c.walls[0];
+  }
+
+  function step(to) {
+    if (won) return;
+    var last = path[path.length - 1];
+    if (same(to, last)) return;
+
+    // walking back over the previous cell rubs the line out
+    if (path.length > 1 && same(to, path[path.length - 2])) {
+      path.pop();
+      draw();
+      return;
+    }
+    if (!canStep(last, to)) return;
+
+    // don't let the line cross itself
+    for (var i = 0; i < path.length; i++) if (same(path[i], to)) return;
+
+    if (startedAt === null) startedAt = Date.now();
+    path.push(to);
+
+    if (same(to, endCell())) finish();
+    draw();
+  }
+
+  function finish() {
+    won = true;
+    elapsed = startedAt ? Math.round((Date.now() - startedAt) / 1000) : 0;
+    if (elapsed < 60) {
+      timeEl.textContent = 'in ' + elapsed + (elapsed === 1 ? ' second' : ' seconds');
+    } else {
+      var m = Math.floor(elapsed / 60), s = elapsed % 60;
+      timeEl.textContent = 'in ' + m + ' min ' + (s < 10 ? '0' : '') + s + ' sec';
+    }
+    winEl.classList.add('show');
+  }
+
+  function cellAt(e) {
+    var rect = canvas.getBoundingClientRect();
+    var x = Math.floor((e.clientX - rect.left) / (rect.width / cols));
+    var y = Math.floor((e.clientY - rect.top) / (rect.height / rows));
+    if (x < 0 || y < 0 || x >= cols || y >= rows) return null;
+    return { x: x, y: y };
+  }
+
+  // ── Input ─────────────────────────────────────────────────
+  canvas.addEventListener('pointerdown', function (e) {
+    if (won) return;
+    var c = cellAt(e);
+    if (!c) return;
+    canvas.focus();
+
+    // grabbing a cell already on the line rewinds back to it
+    for (var i = 0; i < path.length; i++) {
+      if (same(path[i], c)) {
+        path.length = i + 1;
+        dragging = true;
+        canvas.setPointerCapture(e.pointerId);
+        draw();
+        return;
+      }
+    }
+    // otherwise you can only pick the line up from where it left off
+    if (canStep(path[path.length - 1], c)) {
+      dragging = true;
+      canvas.setPointerCapture(e.pointerId);
+      step(c);
+    }
+  });
+
+  canvas.addEventListener('pointermove', function (e) {
+    if (!dragging || won) return;
+    e.preventDefault();
+    var c = cellAt(e);
+    if (c) step(c);
+  });
+
+  function release(e) {
+    if (!dragging) return;
+    dragging = false;
+    if (canvas.hasPointerCapture && canvas.hasPointerCapture(e.pointerId)) {
+      canvas.releasePointerCapture(e.pointerId);
+    }
+  }
+  canvas.addEventListener('pointerup', release);
+  canvas.addEventListener('pointercancel', release);
+
+  var KEYS = {
+    ArrowUp: { dx: 0, dy: -1 }, ArrowRight: { dx: 1, dy: 0 },
+    ArrowDown: { dx: 0, dy: 1 }, ArrowLeft: { dx: -1, dy: 0 }
+  };
+  canvas.addEventListener('keydown', function (e) {
+    var d = KEYS[e.key];
+    if (!d || won) return;
+    e.preventDefault();
+    var last = path[path.length - 1];
+    step({ x: last.x + d.dx, y: last.y + d.dy });
+  });
+
+  // ── Reset / resize ────────────────────────────────────────
+  function clearLine() {
+    path = [startCell()];
+    won = false;
+    dragging = false;
+    startedAt = null;
+    winEl.classList.remove('show');
+    draw();
+  }
+
+  function newMaze() {
+    layout();
+    generate();
+    clearLine();
+  }
+
+  document.getElementById('newBtn').addEventListener('click', newMaze);
+  document.getElementById('clearBtn').addEventListener('click', clearLine);
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      var prevCols = cols, prevRows = rows;
+      layout();
+      // a different grid needs a different maze; otherwise keep the one in play
+      if (cols !== prevCols || rows !== prevRows) { generate(); clearLine(); }
+      else draw();
+    }, 150);
+  });
+
+  newMaze();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+})();
+</script>
+</body>
+</html>

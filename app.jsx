@@ -1161,7 +1161,9 @@ function Footer() {
       <div className="script" style={{
         fontSize: 58, color: 'var(--camel)', lineHeight: 1, marginBottom: 14,
       }}>
-        Erika &amp; Brendan
+        Erika{' '}
+        <a href="/maze.html" aria-label="A little detour" style={{ color: 'inherit', textDecoration: 'none' }}>&amp;</a>
+        {' '}Brendan
       </div>
       <div className="caps" style={{
         color: 'var(--ink-soft)', fontSize: 12, letterSpacing: '0.22em',
