@@ -37,13 +37,13 @@ const PALETTES = {
 // LINE-ART COUPLE (mirrors the save-the-date illustration)
 // ──────────────────────────────────────────────────────────
 function LineArtCouple({ color = 'currentColor', width = 420 }) {
-  // Real line-art illustration — replaces the synthetic SVG
+  // Real line-art illustration - replaces the synthetic SVG
   return (
     <img src="photos/lineart.png" alt="Erika and Brendan, line art"
       width={width}
       style={{
         maxWidth: '100%', height: 'auto', display: 'block', margin: '0 auto',
-        // tint using the current ink color via filter if needed — kept simple
+        // tint using the current ink color via filter if needed - kept simple
       }} />
   );
 }
@@ -113,7 +113,7 @@ function Nav() {
 }
 
 // ──────────────────────────────────────────────────────────
-// HERO — echoes the save-the-date
+// HERO - echoes the save-the-date
 // ──────────────────────────────────────────────────────────
 function Hero({ variant }) {
   if (variant === 'photo') {
@@ -162,7 +162,7 @@ function Hero({ variant }) {
     );
   }
 
-  // Default — "postcard" version echoing the save-the-date
+  // Default - "postcard" version echoing the save-the-date
   return (
     <section id="top" style={{
       minHeight: '100vh', position: 'relative',
@@ -220,7 +220,7 @@ function Hero({ variant }) {
 }
 
 // ──────────────────────────────────────────────────────────
-// STORY — the Japan proposal, told with photos
+// STORY - the Japan proposal, told with photos
 // ──────────────────────────────────────────────────────────
 function Story() {
   return (
@@ -245,7 +245,7 @@ function Story() {
           </p>
         </div>
 
-        {/* Photo sequence — the proposal */}
+        {/* Photo sequence - the proposal */}
         <div className="stack-md" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32,
           marginTop: 100, alignItems: 'center',
@@ -359,7 +359,7 @@ function Story() {
 }
 
 // ──────────────────────────────────────────────────────────
-// THE DAY — schedule + venue
+// THE DAY - schedule + venue
 // ──────────────────────────────────────────────────────────
 function Day() {
   return (
@@ -399,7 +399,7 @@ function Day() {
             </div>
             <div>
               {[
-                ['3:00', 'Pre-ceremony', 'Arrive, enjoy a drink &amp; some live music, then find your seat'],
+                ['3:00', 'Pre-ceremony', 'Arrive to some live music, then find your seat'],
                 ['3:30', 'Ceremony', 'A strict start, so please be seated in good time'],
                 ['4:15', 'Canapé hour', 'Drinks &amp; canapés'],
                 ['5:30', 'Reception', 'Dinner, speeches &amp; dancing'],
@@ -444,11 +444,12 @@ function Day() {
                 Adam's Peak Country Estate
               </h3>
               <p style={{ fontSize: 14, color: 'var(--ink-soft)', lineHeight: 1.85, marginBottom: 28 }}>
-                A country estate in Broke, set against sweeping views of the
-                Yellow Rock Escarpment and the Brokenback Ranges. The Barn, The Hay Shed,
-                and the grounds — including a century-old Iron Bark tree — make it one
-                of the Hunter Valley's most beautiful private settings. We're keeping
-                the rest a surprise until you arrive.
+                A private country estate in Broke, where the whole day happens in
+                one place. The ceremony is outdoors on the lawn, canapés follow
+                outside on the grounds, then dinner and dancing move into The Barn,
+                which is fully enclosed and air-conditioned. If the weather turns,
+                the ceremony shifts under the covered Hay Shed, so it goes ahead
+                rain or shine.
               </p>
 
               <hr className="hairline" style={{ margin: '24px 0' }} />
@@ -494,22 +495,9 @@ function Row({ k, v }) {
 }
 
 // ──────────────────────────────────────────────────────────
-// ATTIRE — dress code + colour palette
+// ATTIRE - dress code
 // ──────────────────────────────────────────────────────────
 function Attire() {
-  const palette = [
-    { name: 'Sage', hex: '#9CAF88' },
-    { name: 'Terracotta', hex: '#C56C49' },
-    { name: 'Dusty Blue', hex: '#7E97A8' },
-    { name: 'Camel', hex: '#C19A6B' },
-    { name: 'Olive', hex: '#7C7A4A' },
-  ];
-  const darkPalette = [
-    { name: 'Navy', hex: '#1C3058' },
-    { name: 'Charcoal', hex: '#4A4A4A' },
-    { name: 'Black', hex: '#1A1A1A' },
-  ];
-
   const cardStyle = {
     background: 'transparent',
     border: '1px solid oklch(0.55 0.03 50)',
@@ -548,46 +536,8 @@ function Attire() {
         }}>
           We ask that you wear semi-formal attire. The wedding is on a country
           estate, with an outdoor ceremony and a barn-style reception. Dress for
-          the setting — bring your sunglasses, and skip the stilettos.
+          the setting. Bring your sunglasses, and skip the stilettos.
         </p>
-
-        {/* Colour palette */}
-        <div style={{ marginTop: 64, textAlign: 'center' }}>
-          <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', marginBottom: 22 }}>
-            A few shades we love
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 28 }}>
-            {palette.map((c) => (
-              <div key={c.name} style={{ textAlign: 'center' }}>
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%',
-                  background: c.hex, margin: '0 auto 12px',
-                  border: '1px solid oklch(0.55 0.03 50)',
-                }} />
-                <div className="mono" style={{ fontSize: 9, color: 'oklch(0.82 0.02 70)' }}>
-                  {c.name}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mono" style={{ color: 'oklch(0.78 0.02 70)', margin: '36px 0 22px' }}>
-            Classic base colours
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 28 }}>
-            {darkPalette.map((c) => (
-              <div key={c.name} style={{ textAlign: 'center' }}>
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%',
-                  background: c.hex, margin: '0 auto 12px',
-                  border: '1px solid oklch(0.55 0.03 50)',
-                }} />
-                <div className="mono" style={{ fontSize: 9, color: 'oklch(0.82 0.02 70)' }}>
-                  {c.name}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* For her / For him */}
         <div className="stack-md" style={{
@@ -603,9 +553,9 @@ function Attire() {
           <div style={cardStyle}>
             <div className="serif" style={headingStyle}>For the men</div>
             <p style={bodyStyle}>
-              A suit or blazer and trousers — navy, charcoal, black, or anything
-              in between all work perfectly. If you'd like to pick up a colour from
-              the palette, even better. Please leave jeans, chinos and sneakers behind.
+              A suit, or a blazer and trousers. Navy, charcoal, black and
+              everything in between all work perfectly. Please leave jeans,
+              chinos and sneakers behind.
             </p>
           </div>
         </div>
@@ -645,14 +595,14 @@ function Stay() {
     },
     {
       name: "The Lane Retreat",
-      area: "Pokolbinlbin",
+      area: "Pokolbin",
       cap: "Sleeps 2",
       note: "An elegant 4-star retreat with a pool, sun terrace and lush gardens, just a short drive from the wineries.",
       link: "https://www.booking.com/hotel/au/the-lane-retreat.en-gb.html?label=gen173nr-10CAEoggI46AdIM1gEaA-IAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AtOZgNEGwAIB0gIkNjI5MWZkMmUtNjUxMS00NDRlLWI3ZGEtNDY3YzgzNDIyNTYy2AIB4AIB&aid=304142&ucfs=1&arphpl=1&checkin=2027-04-02&checkout=2027-04-05",
     },
     {
       name: "Wine Country Villas",
-      area: "Pokolbinlbin",
+      area: "Pokolbin",
       cap: "Sleeps 2",
       note: "Private villas set on 25 acres in the heart of the Hunter, a peaceful base close to the cellar doors.",
       link: "https://www.booking.com/hotel/au/wine-country-villas.en-gb.html?aid=304142&checkin=2027-04-02&checkout=2027-04-04&group_adults=2&no_rooms=1&group_children=0",
@@ -669,7 +619,7 @@ function Stay() {
           maxWidth: 640, margin: '36px auto 0', color: 'var(--ink-soft)',
           lineHeight: 1.5,
         }}>
-          The Hunter is best as a long weekend. To use the free bus service to and from the wedding, we ask that you stay in Pokolbinlbin or Broke. Here are a few places to start your search.
+          The Hunter is best as a long weekend. To use the free bus service to and from the wedding, we ask that you stay in Pokolbin or Broke. Here are a few places to start your search.
         </p>
 
         <div className="stack-md" style={{
@@ -746,10 +696,11 @@ function FAQ() {
   const items = [
     ['Can I bring a plus one?', 'You would have been told if you have a plus one. Otherwise, we\'ve kept the numbers intentionally small, so please don\'t take it personally.'],
     ['Are kids invited?', 'Little ones are welcome. Just have a chat with us first so we can plan properly.'],
-    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbinlbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
+    ['How do I get there?', 'Adam\'s Peak is in the Hunter Valley, about 2 hours north of Sydney. We\'ve organised a free bus to and from the wedding for people staying in Broke or in Pokolbin. Note there are no taxis or Ubers in Broke, so you\'ll need to either use our free bus or drive. Pickup points and timings will be shared closer to the day.'],
     ['Is there parking?', 'Yes. Free, on-site, and plenty of it.'],
     ['What about dietary needs?', 'The RSVP form has a spot to tell us about allergies, intolerances, and preferences. The kitchen is excellent and very accommodating.'],
-    ['Do you have a gift registry?', 'We don\'t have a gift registry — we have all we need. If you\'d like to give us something, there will be a wishing well on the night.'],
+    ['What is the brunch the next morning?', 'A very casual continental brunch with egg and bacon rolls. Come any time between 9:30 and 11, stay as long or as little as you like. There will be picnic rugs out, so dress as comfortably as you please.'],
+    ['Do you have a gift registry?', 'We don\'t have a gift registry. We have all we need, but if you\'d like to give us something, there will be a wishing well on the night.'],
   ];
   return (
     <section id="faq" style={{
@@ -805,7 +756,7 @@ function FAQ() {
 }
 
 // ──────────────────────────────────────────────────────────
-// RSVP — multi-step
+// RSVP - multi-step
 // ──────────────────────────────────────────────────────────
 function RSVP() {
   const [step, setStep] = useState(0);
@@ -813,7 +764,8 @@ function RSVP() {
   const [attending, setAttending] = useState(null);
   const [guests, setGuests] = useState([]);
   const [bus, setBus] = useState(null);
-  const [breakfast, setBreakfast] = useState(null);
+  const [busAddress, setBusAddress] = useState('');
+  const [brunch, setBrunch] = useState(null);
   const [diet, setDiet] = useState('');
   const [song, setSong] = useState('');
   const [message, setMessage] = useState('');
@@ -826,7 +778,7 @@ function RSVP() {
 
   const reset = () => {
     setStep(0); setName(''); setAttending(null);
-    setGuests([]); setBus(null); setBreakfast(null); setDiet(''); setSong(''); setMessage('');
+    setGuests([]); setBus(null); setBusAddress(''); setBrunch(null); setDiet(''); setSong(''); setMessage('');
     setSubmitError('');
   };
 
@@ -846,11 +798,12 @@ function RSVP() {
           attending: attending ? 'Yes' : 'No',
           guests: guests.filter(Boolean).join(', '),
           bus: attending === true ? (bus === true ? 'Yes' : bus === false ? 'No' : '') : 'N/A',
-          breakfast: attending === true ? (breakfast === true ? 'Yes' : breakfast === false ? 'No' : '') : 'N/A',
+          busAddress: attending === true && bus === true ? busAddress : 'N/A',
+          brunch: attending === true ? (brunch === true ? 'Yes' : brunch === false ? 'No' : '') : 'N/A',
           dietary: diet || '',
           song: song || '',
           message: message || '',
-          _subject: `Wedding RSVP — ${name}`,
+          _subject: `Wedding RSVP: ${name}`,
         }),
       });
       if (!res.ok) {
@@ -894,11 +847,13 @@ function RSVP() {
           }}>
             Will you<br />join us?
           </h2>
-          <p className="serif" style={{
-            fontSize: 18, fontStyle: 'italic', color: 'oklch(0.78 0.02 70)',
-          }}>
-            Kindly reply by 31 October 2026.
-          </p>
+          {step !== 2 && (
+            <p className="serif" style={{
+              fontSize: 18, fontStyle: 'italic', color: 'oklch(0.78 0.02 70)',
+            }}>
+              Kindly reply by 20 February 2027.
+            </p>
+          )}
         </div>
 
         {step === 0 && (
@@ -996,12 +951,17 @@ function RSVP() {
                     <Toggle active={bus === true} onClick={() => setBus(true)}>Yes please</Toggle>
                     <Toggle active={bus === false} onClick={() => setBus(false)}>We'll make our own way</Toggle>
                   </div>
+                  {bus === true && (
+                    <input type="text" value={busAddress} onChange={e => setBusAddress(e.target.value)}
+                      placeholder="Street address where you're staying"
+                      style={{ ...darkInput, marginTop: 12 }} />
+                  )}
                 </Field>
 
-                <Field label="Join us for breakfast the next morning?" hint="A relaxed breakfast with coffee the morning after, from 8:30 to 10:30. No need to dress up — just come as you are before you head off.">
+                <Field label="Join us for brunch the next morning?" hint="A relaxed continental brunch with egg and bacon rolls, from 9:30 to 11. Picnic rugs on the grass, come and go as you please.">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <Toggle active={breakfast === true} onClick={() => setBreakfast(true)}>We'll be there</Toggle>
-                    <Toggle active={breakfast === false} onClick={() => setBreakfast(false)}>Not this time</Toggle>
+                    <Toggle active={brunch === true} onClick={() => setBrunch(true)}>We'll be there</Toggle>
+                    <Toggle active={brunch === false} onClick={() => setBrunch(false)}>Not this time</Toggle>
                   </div>
                 </Field>
 
