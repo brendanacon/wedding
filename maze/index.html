@@ -133,7 +133,23 @@
     margin-top: 34px;
     display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
   }
-  .controls[hidden] { display: none; }
+  /* display:contents lets the grouped buttons sit in the same flex row */
+  .grp { display: contents; }
+  .grp[hidden] { display: none; }
+  #expandBtn { border-color: var(--camel); color: var(--camel-deep); }
+
+  /* full screen: drop the page furniture and give the board the room */
+  body.expanded { padding: 14px 12px 18px; justify-content: center; }
+  body.expanded .wrap { max-width: none; }
+  body.expanded .eyebrow,
+  body.expanded h1,
+  body.expanded .rule,
+  body.expanded .lede,
+  body.expanded .back { display: none; }
+  body.expanded .board { margin-top: 0; }
+  body.expanded .hint { margin-top: 14px; }
+  body.expanded .win { margin-top: 16px; }
+  body.expanded .controls { margin-top: 18px; }
   button {
     font-family: 'Jost', sans-serif;
     font-size: 10px;
@@ -199,15 +215,17 @@
 
     <div class="over" id="over"><span id="overText"></span></div>
 
-    <div class="controls" id="mazeControls">
-      <button id="newBtn">New maze</button>
-      <button id="clearBtn">Clear the line</button>
-      <button id="nextBtn">Next game</button>
-    </div>
-
-    <div class="controls" id="runControls" hidden>
-      <button id="restartBtn">Run again</button>
-      <button id="backBtn">Back to the maze</button>
+    <div class="controls">
+      <span class="grp" id="mazeControls">
+        <button id="newBtn">New maze</button>
+        <button id="clearBtn">Clear the line</button>
+        <button id="nextBtn">Next game</button>
+      </span>
+      <span class="grp" id="runControls" hidden>
+        <button id="restartBtn">Run again</button>
+        <button id="backBtn">Back to the maze</button>
+      </span>
+      <button id="expandBtn">Full screen</button>
     </div>
 
     <a class="back" href="/">&larr; back to the wedding</a>
@@ -289,10 +307,11 @@
     cols = portrait ? 11 : 17;
     rows = portrait ? 15 : 12;
 
+    var big = document.body.classList.contains('expanded');
     var board = canvas.closest('.board');
     var pad = portrait ? 20 : 32;
-    var availW = Math.min(board.parentNode.clientWidth, 660) - pad;
-    var availH = Math.max(300, window.innerHeight - 340);
+    var availW = Math.min(board.parentNode.clientWidth, big ? 1800 : 660) - pad;
+    var availH = Math.max(300, window.innerHeight - (big ? 190 : 340));
 
     cell = Math.floor(Math.min(availW / cols, availH / rows));
     cell = Math.max(cell, 18);
@@ -712,15 +731,16 @@
     }
   }
 
-  function hits(o) {
+  function overlapsX(o) {
     var half = R.figH * 0.15;                 // forgiving body width
-    var feet = R.ground - G.y;
     var pad = (o.w - o.cw) / 2;               // centre the narrower hit box
-    var left = o.x + pad, right = o.x + o.w - pad;
+    return (G.x + half > o.x + pad) && (G.x - half < o.x + o.w - pad);
+  }
+
+  function hits(o) {
     // grass at the foot of the sprite is scenery, not something to trip on
     var oTop = R.ground - o.h * 0.88;
-    var overlapX = (G.x + half > left) && (G.x - half < right);
-    return overlapX && feet > oTop;
+    return overlapsX(o) && (R.ground - G.y) > oTop;
   }
 
   // ── Runner drawing ────────────────────────────────────────
@@ -925,17 +945,80 @@
     loop();
   });
 
+  // Resizing mid-run would otherwise leave obstacles at the old scale,
+  // so carry a run in progress across the change.
+  function relayout() {
+    var oldFigH = R.figH, oldW = R.w;
+    var prevCols = cols, prevRows = rows;
+    layout();
+    tuneJump();
+    if (cols !== prevCols || rows !== prevRows) { generate(); clearLine(); }
+    else draw();
+    if (G) {
+      var fs = oldFigH ? R.figH / oldFigH : 1;
+      var ws = oldW ? R.w / oldW : 1;
+      var oldX = G.x;
+      G.x = R.w * 0.16;
+      // Gaps have to scale about Brendan, not about the origin: scaling from
+      // zero drags anything just behind him back on top of him.
+      G.y *= fs; G.vy *= fs;
+      G.speed *= ws; G.nextGap *= ws; G.since *= ws;
+      if (G.erikaX !== null) G.erikaX = G.x + (G.erikaX - oldX) * ws;
+      if (G.pan) G.pan *= ws;
+      G.obstacles.forEach(function (o) {
+        o.x = G.x + (o.x - oldX) * ws;
+        o.w *= fs; o.h *= fs; o.cw *= fs;
+      });
+      G.pebbles.forEach(function (pb) { pb.x = G.x + (pb.x - oldX) * ws; });
+      // he may have been mid-jump over something; at the new scale that
+      // straddle can register as a hit, so retire whatever he is over
+      G.obstacles = G.obstacles.filter(function (o) { return !overlapsX(o); });
+      drawRun();
+    }
+  }
+
+  // ── Full screen ───────────────────────────────────────────
+  var expandBtn = document.getElementById('expandBtn');
+
+  function setExpanded(on) {
+    document.body.classList.toggle('expanded', on);
+    expandBtn.textContent = on ? 'Exit full screen' : 'Full screen';
+    relayout();
+  }
+
+  expandBtn.addEventListener('click', function () {
+    var on = !document.body.classList.contains('expanded');
+    if (on) {
+      setExpanded(true);
+      var el = document.documentElement;
+      var req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (req) {
+        try {
+          var pr = req.call(el);
+          if (pr && pr.catch) pr.catch(function () {});
+        } catch (e) {}
+      }
+    } else {
+      var ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if ((document.fullscreenElement || document.webkitFullscreenElement) && ex) {
+        try { ex.call(document); } catch (e) {}
+      }
+      setExpanded(false);
+    }
+  });
+
+  // Escape leaves fullscreen without touching the button, so follow it back
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (ev) {
+    document.addEventListener(ev, function () {
+      var fs = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fs && document.body.classList.contains('expanded')) setExpanded(false);
+    });
+  });
+
   var resizeTimer;
   window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function () {
-      var prevCols = cols, prevRows = rows;
-      layout();
-      tuneJump();
-      if (cols !== prevCols || rows !== prevRows) { generate(); clearLine(); }
-      else draw();
-      if (G) { G.x = R.w * 0.16; drawRun(); }
-    }, 150);
+    resizeTimer = setTimeout(relayout, 150);
   });
 
   newMaze();
