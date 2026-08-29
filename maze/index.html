@@ -525,9 +525,8 @@
     w: '#6B4A32', W: '#4E3625', r: '#5E7C48' // trunk, grass
   };
 
-  // Brendan mid-stride, drawn facing left like the reference and
-  // flipped when he runs, so he faces the way he is going.
-  var BRENDAN_A = [
+  // Brendan drawn facing right, one frame per phase of the run.
+  var B_HEAD = [
     '.......hhhhh......',
     '......hhhhhhh.....',
     '......hhhhhhhh....',
@@ -535,66 +534,88 @@
     '......hsssissss...',
     '......hssssssss...',
     '.......sssssS.....',
-    '.......nnnnn......',
-    '......jjjjjjj.....',
-    '.....jjjjtjjjj....',
-    '...sjjjjtjjjjj....',
-    '...sjjjjttjjjjs...',
-    '....jjjjttjjjjs...',
-    '.....jjjjjjjj.....',
-    '......jjjjjj......',
-    '......dddddd......',
-    '.....dddd.ddd.....',
-    '....dddd..dddd....',
-    '...dddd....dddd...',
-    '..dddd.....dddd...',
-    '.bbbb.......ddd...',
-    '.BBB........ddd...',
-    '............bbbb..',
-    '............BBBB..'
+    '.......nnnnn......'
   ];
-  var BRENDAN_B = [
-    '.......hhhhh......',
-    '......hhhhhhh.....',
-    '......hhhhhhhh....',
-    '......hhssssss....',
-    '......hsssissss...',
-    '......hssssssss...',
-    '.......sssssS.....',
-    '.......nnnnn......',
+  var B_TORSO = [
     '......jjjjjjj.....',
     '.....jjjjtjjjj....',
     '...sjjjjtjjjjj....',
     '...sjjjjttjjjjs...',
     '....jjjjttjjjjs...',
     '.....jjjjjjjj.....',
-    '......jjjjjj......',
-    '......dddddd......',
-    '.....ddd.dddd.....',
-    '....ddd...dddd....',
-    '....ddd....dddd...',
-    '...ddd......ddd...',
-    '...ddd......bbbb..',
-    '...ddd......BBB...',
-    '..bbbb............',
-    '..BBBB............'
+    '......jjjjjj......'
   ];
-  var BRENDAN_JUMP = [
-    '.......hhhhh......',
-    '......hhhhhhh.....',
-    '......hhhhhhhh....',
-    '......hhssssss....',
-    '......hsssissss...',
-    '......hssssssss...',
-    '.......sssssS.....',
-    '.......nnnnn......',
-    '......jjjjjjj.....',
-    '.....jjjjtjjjj....',
-    '...sjjjjtjjjjj....',
-    '...sjjjjttjjjjs...',
-    '....jjjjttjjjjs...',
-    '.....jjjjjjjj.....',
-    '......jjjjjj......',
+  var B_LEGS = [
+    [
+      '......dddddd......',
+      '.....dddd.ddd.....',
+      '....dddd..dddd....',
+      '...dddd....dddd...',
+      '..dddd.....dddd...',
+      '.bbbb.......ddd...',
+      '.BBB........ddd...',
+      '............bbbb..',
+      '............BBBB..'
+  ],
+    [
+      '......dddddd......',
+      '.....ddddddd......',
+      '....dddd..ddd.....',
+      '...dddd...dddd....',
+      '..dddd.....ddd....',
+      '..bbbb.....dddd...',
+      '..BBB.......ddd...',
+      '...........bbbb...',
+      '...........BBBB...'
+  ],
+    [
+      '......dddddd......',
+      '......dddddd......',
+      '.....ddd.ddd......',
+      '.....ddd.dddd.....',
+      '....ddd...dddd....',
+      '...bbbb....ddd....',
+      '...BBB.....dddd...',
+      '..........bbbb....',
+      '..........BBBB....'
+  ],
+    [
+      '......dddddd......',
+      '.....ddd.dddd.....',
+      '....ddd...dddd....',
+      '...ddd.....dddd...',
+      '...ddd......dddd..',
+      '...ddd.......bbbb.',
+      '...ddd.......BBB..',
+      '..bbbb............',
+      '..BBBB............'
+  ],
+    [
+      '......dddddd......',
+      '......ddddddd.....',
+      '.....ddd..dddd....',
+      '....dddd...dddd...',
+      '....ddd.....dddd..',
+      '...ddd......bbbb..',
+      '...dddd......BBB..',
+      '...bbbb...........',
+      '...BBBB...........'
+  ],
+    [
+      '......dddddd......',
+      '......dddddd......',
+      '......ddd.ddd.....',
+      '.....dddd.ddd.....',
+      '....dddd...ddd....',
+      '....ddd....bbbb...',
+      '...dddd.....BBB...',
+      '....bbbb..........',
+      '....BBBB..........'
+  ]
+  ];
+  // one sprite per phase of the stride, assembled from the shared upper body
+  var BRENDAN_RUN = B_LEGS.map(function (l) { return B_HEAD.concat(B_TORSO, l); });
+  var BRENDAN_JUMP = B_HEAD.concat(B_TORSO, [
     '......dddddd......',
     '.....dddddddd.....',
     '....dddd..dddd....',
@@ -604,23 +625,16 @@
     '..................',
     '..................',
     '..................'
-  ];
-  var BRENDAN_HUG = [
-    '.......hhhhh......',
-    '......hhhhhhh.....',
-    '......hhhhhhhh....',
-    '......hhssssss....',
-    '......hsssissss...',
-    '......hssssssss...',
-    '.......sssssS.....',
-    '.......nnnnn......',
+  ]);
+  var BRENDAN_HUG = B_HEAD.concat([
     '......jjjjjjj.....',
     '.....jjjjtjjjjjjjj',
     '...sjjjjtjjjjjjjjs',
     '...sjjjjttjjjj....',
     '....jjjjttjjj.....',
     '.....jjjjjjjj.....',
-    '......jjjjjj......',
+    '......jjjjjj......'
+  ], [
     '......dddddd......',
     '......dddddd......',
     '.....ddd.ddd......',
@@ -630,7 +644,7 @@
     '.....ddd.ddd......',
     '....bbbb.bbbb.....',
     '....BBB...BBB.....'
-  ];
+  ]);
   var ERIKA = [
     '.....kkkkkk.......',
     '....kkkkkkkk......',
@@ -678,32 +692,54 @@
     'rrrr..ww..rrrr'
   ];
   var BUSH = [
-    '....pPPp....',
-    '...pPQQPp...',
-    '..pPPPPPPp..',
-    '.pPQPPPPQPp.',
-    'pPPPPPPPPPPp',
-    'pPQPPPPPPQPp',
-    '.pPPPPPPPPp.',
-    '.....ww.....',
-    '.rr..wW..rr.',
-    'rrrr.ww.rrrr'
+    '.....pPPPPp.....',
+    '...pPQQPPQQPp...',
+    '..pPQQPPPPQQPp..',
+    '.pPQQPPQQPPQQPp.',
+    'pPQPPQQPPQQPPQPp',
+    'pPQQPPQQPPQQPPQp',
+    'pPPQQPPQQPPQQPPp',
+    '.pPPQQPPQQPPQPp.',
+    '..pPPQQPPQQPPp..',
+    '...rrrrrrrrrr...',
+    '..rrrrrrrrrrrr..',
+    'rrrr.rrrrrr.rrrr'
   ];
 
-  function drawSprite(rows, left, top, px, flip) {
+  var spriteCache = new Map();
+  function spriteCanvas(rows, px) {
+    var sizes = spriteCache.get(rows);
+    if (!sizes) { sizes = {}; spriteCache.set(rows, sizes); }
+    if (sizes[px]) return sizes[px];
     var wide = rows[0].length;
+    var cv = document.createElement('canvas');
+    cv.width = wide * px; cv.height = rows.length * px;
+    var g = cv.getContext('2d');
     for (var r = 0; r < rows.length; r++) {
-      var row = rows[r];
       for (var c = 0; c < wide; c++) {
-        var ch = row.charAt(c);
+        var ch = rows[r].charAt(c);
         if (ch === '.' || ch === '') continue;
         var colour = PAL[ch];
         if (!colour) continue;
-        var cx = flip ? (wide - 1 - c) : c;
-        rx.fillStyle = colour;
-        rx.fillRect(Math.round(left + cx * px), Math.round(top + r * px),
-                    Math.ceil(px), Math.ceil(px));
+        g.fillStyle = colour;
+        g.fillRect(c * px, r * px, px, px);
       }
+    }
+    sizes[px] = cv;
+    return cv;
+  }
+
+  function drawSprite(rows, left, top, px, flip) {
+    var img = spriteCanvas(rows, px);
+    left = Math.round(left); top = Math.round(top);
+    if (flip) {
+      rx.save();
+      rx.translate(left + img.width, top);
+      rx.scale(-1, 1);
+      rx.drawImage(img, 0, 0);
+      rx.restore();
+    } else {
+      rx.drawImage(img, left, top);
     }
   }
   var G = null;      // game state
@@ -718,8 +754,8 @@
     rx.setTransform(dpr, 0, 0, dpr, 0, 0);
     R.w = w; R.h = h;
     R.ground = h * 0.82;
-    R.px = Math.max(2, Math.round((h * 0.21) / BRENDAN_A.length));
-    R.figH = BRENDAN_A.length * R.px;
+    R.px = Math.max(2, Math.round((h * 0.21) / BRENDAN_RUN[0].length));
+    R.figH = BRENDAN_RUN[0].length * R.px;
     if (G) { G.y = Math.min(G.y, 0); drawRun(); }
   }
 
@@ -731,7 +767,8 @@
       vy: 0,
       speed: R.w * 0.0072,
       score: 0,
-      t: 0,                    // stride phase
+      t: 0,                    // bob/idle phase
+      stride: 0,               // run-cycle position, driven by distance
       obstacles: [],
       pebbles: [],
       nextGap: R.w * 0.55,
@@ -742,6 +779,7 @@
     for (var i = 0; i < 10; i++) {
       G.pebbles.push({ x: Math.random() * R.w, w: 2 + Math.random() * 3 });
     }
+
     winEl.classList.remove('show');
     overEl.classList.remove('show');
     drawRun();
@@ -777,6 +815,8 @@
     if (G.phase === 'over' || G.phase === 'won') return;
 
     G.t += dt * 0.32;
+    // one full 6-frame cycle per two strides of ground covered
+    G.stride += (G.speed * dt) / (R.figH * 0.30);
 
     // vertical motion
     G.y += G.vy * dt;
@@ -891,7 +931,7 @@
   // the field at him.
   function drawBrendan(x, feetY, airborne) {
     var art = airborne ? BRENDAN_JUMP
-            : (Math.sin(G.t) > 0 ? BRENDAN_A : BRENDAN_B);
+            : BRENDAN_RUN[Math.floor(G.stride) % BRENDAN_RUN.length];
     var wide = art[0].length * R.px;
     drawSprite(art, x - wide / 2, feetY - art.length * R.px, R.px, false);
   }
