@@ -1,0 +1,542 @@
+[
+  {
+    "file": "background/autumn_forest_row.png",
+    "w": 284,
+    "h": 87,
+    "src": [
+      780,
+      576
+    ]
+  },
+  {
+    "file": "background/bare_tree.png",
+    "w": 77,
+    "h": 108,
+    "src": [
+      422,
+      768
+    ]
+  },
+  {
+    "file": "background/bench.png",
+    "w": 147,
+    "h": 105,
+    "src": [
+      617,
+      776
+    ]
+  },
+  {
+    "file": "background/birds_01.png",
+    "w": 44,
+    "h": 22,
+    "src": [
+      1102,
+      262
+    ]
+  },
+  {
+    "file": "background/birds_02.png",
+    "w": 39,
+    "h": 21,
+    "src": [
+      1176,
+      259
+    ]
+  },
+  {
+    "file": "background/birds_03.png",
+    "w": 36,
+    "h": 19,
+    "src": [
+      1260,
+      262
+    ]
+  },
+  {
+    "file": "background/birds_04.png",
+    "w": 58,
+    "h": 40,
+    "src": [
+      1351,
+      268
+    ]
+  },
+  {
+    "file": "background/birds_05.png",
+    "w": 35,
+    "h": 19,
+    "src": [
+      1427,
+      270
+    ]
+  },
+  {
+    "file": "background/birds_06.png",
+    "w": 34,
+    "h": 19,
+    "src": [
+      1148,
+      284
+    ]
+  },
+  {
+    "file": "background/birds_07.png",
+    "w": 35,
+    "h": 18,
+    "src": [
+      1212,
+      282
+    ]
+  },
+  {
+    "file": "background/birds_08.png",
+    "w": 35,
+    "h": 19,
+    "src": [
+      1301,
+      282
+    ]
+  },
+  {
+    "file": "background/boulder_group.png",
+    "w": 131,
+    "h": 83,
+    "src": [
+      834,
+      466
+    ]
+  },
+  {
+    "file": "background/bridge_stone.png",
+    "w": 322,
+    "h": 91,
+    "src": [
+      959,
+      790
+    ]
+  },
+  {
+    "file": "background/bridge_wood.png",
+    "w": 212,
+    "h": 93,
+    "src": [
+      1306,
+      790
+    ]
+  },
+  {
+    "file": "background/bush_green.png",
+    "w": 128,
+    "h": 84,
+    "src": [
+      982,
+      471
+    ]
+  },
+  {
+    "file": "background/cloud_01.png",
+    "w": 141,
+    "h": 65,
+    "src": [
+      1087,
+      25
+    ]
+  },
+  {
+    "file": "background/cloud_02.png",
+    "w": 91,
+    "h": 45,
+    "src": [
+      1237,
+      42
+    ]
+  },
+  {
+    "file": "background/cloud_03.png",
+    "w": 143,
+    "h": 65,
+    "src": [
+      1340,
+      25
+    ]
+  },
+  {
+    "file": "background/cloud_04.png",
+    "w": 83,
+    "h": 45,
+    "src": [
+      1081,
+      112
+    ]
+  },
+  {
+    "file": "background/cloud_05.png",
+    "w": 78,
+    "h": 43,
+    "src": [
+      1172,
+      114
+    ]
+  },
+  {
+    "file": "background/cloud_06.png",
+    "w": 70,
+    "h": 36,
+    "src": [
+      1257,
+      121
+    ]
+  },
+  {
+    "file": "background/cloud_07.png",
+    "w": 90,
+    "h": 46,
+    "src": [
+      1334,
+      112
+    ]
+  },
+  {
+    "file": "background/cloud_08.png",
+    "w": 72,
+    "h": 46,
+    "src": [
+      1427,
+      112
+    ]
+  },
+  {
+    "file": "background/grass_tuft_dry.png",
+    "w": 80,
+    "h": 56,
+    "src": [
+      1016,
+      382
+    ]
+  },
+  {
+    "file": "background/ground_strip_cobble.png",
+    "w": 801,
+    "h": 85,
+    "src": [
+      17,
+      478
+    ]
+  },
+  {
+    "file": "background/ground_strip_dirt.png",
+    "w": 800,
+    "h": 95,
+    "src": [
+      18,
+      370
+    ]
+  },
+  {
+    "file": "background/ground_tile_01.png",
+    "w": 226,
+    "h": 98,
+    "src": [
+      14,
+      896
+    ]
+  },
+  {
+    "file": "background/ground_tile_02.png",
+    "w": 210,
+    "h": 90,
+    "src": [
+      254,
+      904
+    ]
+  },
+  {
+    "file": "background/ground_tile_03.png",
+    "w": 179,
+    "h": 90,
+    "src": [
+      478,
+      904
+    ]
+  },
+  {
+    "file": "background/ground_tile_04.png",
+    "w": 199,
+    "h": 88,
+    "src": [
+      672,
+      906
+    ]
+  },
+  {
+    "file": "background/ground_tile_05.png",
+    "w": 210,
+    "h": 75,
+    "src": [
+      886,
+      919
+    ]
+  },
+  {
+    "file": "background/ground_tile_06.png",
+    "w": 139,
+    "h": 86,
+    "src": [
+      1114,
+      908
+    ]
+  },
+  {
+    "file": "background/ground_tile_07.png",
+    "w": 167,
+    "h": 79,
+    "src": [
+      1270,
+      914
+    ]
+  },
+  {
+    "file": "background/ground_tile_step.png",
+    "w": 61,
+    "h": 35,
+    "src": [
+      1453,
+      958
+    ]
+  },
+  {
+    "file": "background/lamp_post.png",
+    "w": 42,
+    "h": 140,
+    "src": [
+      891,
+      746
+    ]
+  },
+  {
+    "file": "background/log.png",
+    "w": 93,
+    "h": 63,
+    "src": [
+      508,
+      821
+    ]
+  },
+  {
+    "file": "background/mountain_lake_backdrop.png",
+    "w": 1048,
+    "h": 347,
+    "src": [
+      14,
+      11
+    ]
+  },
+  {
+    "file": "background/pine_single.png",
+    "w": 81,
+    "h": 176,
+    "src": [
+      1249,
+      369
+    ]
+  },
+  {
+    "file": "background/pines_group_01.png",
+    "w": 110,
+    "h": 217,
+    "src": [
+      1128,
+      329
+    ]
+  },
+  {
+    "file": "background/pines_group_02.png",
+    "w": 156,
+    "h": 213,
+    "src": [
+      1344,
+      329
+    ]
+  },
+  {
+    "file": "background/rock_pair.png",
+    "w": 67,
+    "h": 53,
+    "src": [
+      852,
+      386
+    ]
+  },
+  {
+    "file": "background/rock_small.png",
+    "w": 49,
+    "h": 40,
+    "src": [
+      938,
+      399
+    ]
+  },
+  {
+    "file": "background/shore_strip_01.png",
+    "w": 399,
+    "h": 57,
+    "src": [
+      20,
+      687
+    ]
+  },
+  {
+    "file": "background/shore_strip_02.png",
+    "w": 328,
+    "h": 62,
+    "src": [
+      439,
+      682
+    ]
+  },
+  {
+    "file": "background/shrubs_small.png",
+    "w": 98,
+    "h": 51,
+    "src": [
+      1073,
+      615
+    ]
+  },
+  {
+    "file": "background/signpost.png",
+    "w": 79,
+    "h": 115,
+    "src": [
+      790,
+      766
+    ]
+  },
+  {
+    "file": "background/sun_01.png",
+    "w": 56,
+    "h": 57,
+    "src": [
+      1112,
+      177
+    ]
+  },
+  {
+    "file": "background/sun_02.png",
+    "w": 69,
+    "h": 68,
+    "src": [
+      1202,
+      175
+    ]
+  },
+  {
+    "file": "background/sun_03.png",
+    "w": 69,
+    "h": 69,
+    "src": [
+      1296,
+      175
+    ]
+  },
+  {
+    "file": "background/sun_04.png",
+    "w": 70,
+    "h": 68,
+    "src": [
+      1395,
+      175
+    ]
+  },
+  {
+    "file": "background/town_skyline.png",
+    "w": 752,
+    "h": 79,
+    "src": [
+      16,
+      584
+    ]
+  },
+  {
+    "file": "background/tree_autumn_large.png",
+    "w": 170,
+    "h": 120,
+    "src": [
+      1350,
+      555
+    ]
+  },
+  {
+    "file": "background/trees_green_pair.png",
+    "w": 147,
+    "h": 110,
+    "src": [
+      1180,
+      562
+    ]
+  },
+  {
+    "file": "background/water_rock_strip_03.png",
+    "w": 505,
+    "h": 74,
+    "src": [
+      790,
+      671
+    ]
+  },
+  {
+    "file": "background/weeds_01.png",
+    "w": 49,
+    "h": 104,
+    "src": [
+      14,
+      770
+    ]
+  },
+  {
+    "file": "background/weeds_02.png",
+    "w": 53,
+    "h": 104,
+    "src": [
+      69,
+      770
+    ]
+  },
+  {
+    "file": "background/weeds_03.png",
+    "w": 70,
+    "h": 112,
+    "src": [
+      147,
+      764
+    ]
+  },
+  {
+    "file": "background/weeds_04.png",
+    "w": 52,
+    "h": 82,
+    "src": [
+      241,
+      792
+    ]
+  },
+  {
+    "file": "background/weeds_05.png",
+    "w": 46,
+    "h": 74,
+    "src": [
+      312,
+      801
+    ]
+  },
+  {
+    "file": "background/weeds_06.png",
+    "w": 39,
+    "h": 58,
+    "src": [
+      371,
+      817
+    ]
+  }
+]
