@@ -550,30 +550,24 @@
   //    view keeps changing as he runs.
   var BG = {};
   var BGDIR = 'background/';
-  var BGFILES = ['mountain_lake_backdrop','town_skyline','autumn_forest_row',
-    'shore_strip_01','shore_strip_02','water_rock_strip_03',
-    'pine_single','pines_group_01','pines_group_02','trees_green_pair',
-    'tree_autumn_large','bare_tree','bush_green','shrubs_small',
-    'bench','lamp_post','signpost','bridge_stone','bridge_wood',
-    'ground_strip_dirt','ground_strip_cobble',
-    'weeds_01','weeds_02','weeds_03','weeds_04','weeds_05','weeds_06',
-    'grass_tuft_dry','rock_small','rock_pair','boulder_group','log',
+  var BGFILES = ['mountain_lake_backdrop','autumn_forest_row',
+    'tree_autumn_large','bare_tree',
+    'bench','lamp_post','signpost',
+    'ground_tile_04',
+    'weeds_01','weeds_02','weeds_04','weeds_05',
+    'grass_tuft_dry','rock_small','rock_pair',
     'cloud_01','cloud_02','cloud_03','cloud_04','cloud_05','cloud_06','cloud_07','cloud_08',
     'birds_01','birds_02','birds_03','birds_04','birds_05','birds_06','birds_07','birds_08',
     'sun_02'];
 
-  // No conifers here: the thing you jump is a green pine, and the scrub
-  // band must never offer anything that looks like one. Autumn suits the
-  // photograph anyway.
-  var MID_POOL  = ['tree_autumn_large','bare_tree','shrubs_small',
-                   'log','boulder_group','rock_pair'];
-  var RARE_POOL = ['bench','lamp_post','signpost','bridge_stone','bridge_wood'];
+  // Only things nobody would mistake for the green pine or bush you jump.
+  var MID_POOL  = ['bench','lamp_post','signpost','tree_autumn_large','bare_tree'];
+  var RARE_POOL = ['bench','lamp_post','signpost'];
   // Nothing below the path that could pass for an obstacle: small growth only.
-  var FORE_POOL = ['weeds_01','weeds_02','weeds_03','weeds_04','weeds_05','weeds_06',
-                   'grass_tuft_dry','rock_small'];
+  var FORE_POOL = ['weeds_01','weeds_02','weeds_04','weeds_05','grass_tuft_dry','rock_small'];
   var CLOUDS    = ['cloud_01','cloud_02','cloud_03','cloud_04','cloud_05','cloud_06','cloud_07','cloud_08'];
   var BIRDS     = ['birds_01','birds_02','birds_03','birds_04','birds_05','birds_06','birds_07','birds_08'];
-  var GROUNDS   = ['ground_strip_dirt'];   // the cobble reads too heavy under the scene
+  var GROUNDS   = ['ground_tile_04'];   // grass over earth, in one seamless piece
 
   function pick(a) { return a[(Math.random() * a.length) | 0]; }
   function horizon() { return R.ground - R.h * 0.17; }
@@ -646,9 +640,57 @@
   }
 
   // repeat an image across the width at a scroll offset
-  // These strips were cut from a sheet and do not tile edge to edge, so
-  // every second copy is mirrored: the touching columns then match and the
-  // join disappears. A couple of pixels of overlap covers the rounding.
+  // Scaling an image every frame blends its outer pixels toward transparent,
+  // which is what leaves a pale line at every join. So each strip is composed
+  // once into a canvas holding the tile beside a mirrored copy: the inner
+  // join matches by symmetry, and so do the two outer edges, which makes the
+  // whole thing repeat cleanly. That canvas is then blitted 1:1 at whole
+  // pixels, so nothing is ever resampled and no seam can appear.
+  var tileCache = new Map();
+  function seamlessTile(key, h) {
+    var im = BG[key];
+    if (!im) return null;
+    var byH = tileCache.get(key);
+    if (!byH) { byH = {}; tileCache.set(key, byH); }
+    // built at device resolution: anything else gets scaled up on the way
+    // to the screen, and that rescale is what puts the pale line back
+    var kh = Math.max(2, Math.round(h * (R.dpr || 1)));
+    if (byH[kh]) return byH[kh];
+    var w = Math.max(2, Math.round(im.width * (kh / im.height)));
+    var cv = document.createElement('canvas');
+    cv.width = w * 2; cv.height = kh;
+    var g = cv.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    // Drop the outermost column each side: it is a soft edge left by the
+    // cut, and mirroring would sit two of them together as a pale line.
+    var sx = im.width > 4 ? 1 : 0;
+    var sw = im.width > 4 ? im.width - 2 : im.width;
+    g.drawImage(im, sx, 0, sw, im.height, 0, 0, w, kh);
+    g.save();
+    g.translate(w * 2, 0);
+    g.scale(-1, 1);
+    g.drawImage(im, sx, 0, sw, im.height, 0, 0, w, kh);
+    g.restore();
+    byH[kh] = cv;
+    return cv;
+  }
+
+  function tileSeamless(key, off, baseY, h, alpha) {
+    var cv = seamlessTile(key, h);
+    if (!cv) return;
+    var d = R.dpr || 1;
+    var w = cv.width;
+    rx.save();
+    rx.setTransform(1, 0, 0, 1, 0, 0);   // device pixels, so nothing resamples
+    if (alpha !== undefined) rx.globalAlpha = alpha;
+    var top = Math.round(baseY * d) - cv.height;
+    var offD = off * d;
+    var start = -Math.round(((offD % w) + w) % w);
+    for (var x = start; x < R.w * d; x += w) rx.drawImage(cv, x, top);
+    rx.restore();
+  }
+
   function tileBG(key, off, baseY, h, alpha, mirror) {
     var im = BG[key];
     if (!im) return;
@@ -704,7 +746,8 @@
     rc.width = Math.round(w * dpr);
     rc.height = Math.round(h * dpr);
     rx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    R.w = w; R.h = h;
+    R.w = w; R.h = h; R.dpr = dpr;
+    tileCache.clear();
     R.ground = h * 0.82;
     R.figH = Math.round(h * 0.26);
     if (G) { G.y = Math.min(G.y, 0); drawRun(); }
@@ -732,16 +775,16 @@
       groundKey: pick(GROUNDS)
     };
     // seed the view so it does not start empty
-    for (var ci = 0; ci < 5; ci++) {
+    for (var ci = 0; ci < 3; ci++) {
       G.clouds.push({ x: Math.random() * R.w, y: R.h * (0.05 + Math.random() * 0.24),
                       k: pick(CLOUDS), h: R.h * (0.05 + Math.random() * 0.05),
                       a: 0.55 + Math.random() * 0.3 });
     }
-    for (var mi = 0; mi < 4; mi++) addMid(Math.random() * R.w);
-    for (var fi = 0; fi < 7; fi++) addFore(Math.random() * R.w);
-    G.nextMid = R.w * 0.3;
-    G.nextFore = R.w * 0.12;
-    G.nextBird = R.w * (2 + Math.random() * 3);
+    for (var mi = 0; mi < 2; mi++) addMid(Math.random() * R.w);
+    for (var fi = 0; fi < 4; fi++) addFore(Math.random() * R.w);
+    G.nextMid = R.w * 0.7;
+    G.nextFore = R.w * 0.3;
+    G.nextBird = R.w * (4 + Math.random() * 6);
 
     winEl.classList.remove('show');
     overEl.classList.remove('show');
@@ -753,11 +796,8 @@
   // A prop's size follows how far down the scrub band it sits, so the
   // nearer ones read as nearer. Everything stays clear of the path.
   var MID_SIZE = {
-    pines_group_01: 0.155, pines_group_02: 0.155, pine_single: 0.125,
-    trees_green_pair: 0.13, tree_autumn_large: 0.125, bare_tree: 0.11,
-    shrubs_small: 0.05, log: 0.038, boulder_group: 0.05, rock_pair: 0.034,
-    bench: 0.055, lamp_post: 0.095, signpost: 0.07,
-    bridge_stone: 0.06, bridge_wood: 0.058
+    tree_autumn_large: 0.115, bare_tree: 0.10,
+    bench: 0.055, lamp_post: 0.10, signpost: 0.07
   };
 
   function addMid(x) {
@@ -769,7 +809,7 @@
       x: x, k: k,
       h: R.h * (MID_SIZE[k] || 0.08) * (0.72 + t * 0.55) * (0.85 + Math.random() * 0.3),
       flip: !rare && Math.random() < 0.5,
-      drop: band * (0.15 + t * 0.55),            // never within reach of the path
+      drop: band * (0.55 + t * 0.42),            // stands along the path
       a: 0.78 + t * 0.2
     });
   }
@@ -825,9 +865,7 @@
     // every band at its own rate: the mountain barely moves, the weeds fly
     var sp = G.speed * dt;
     G.sky.backdrop += sp * 0.04;
-    G.sky.town     += sp * 0.16;
-    G.sky.forest   += sp * 0.28;
-    G.sky.shore    += sp * 0.42;
+    G.sky.forest   += sp * 0.26;
     G.sky.ground   += sp;
 
     for (var ci = G.clouds.length - 1; ci >= 0; ci--) {
@@ -846,7 +884,7 @@
     if (G.nextBird <= 0) {
       G.birds.push({ x: R.w + 20, y: R.h * (0.07 + Math.random() * 0.2),
                      k: pick(BIRDS), h: R.h * (0.02 + Math.random() * 0.02) });
-      G.nextBird = R.w * (2.5 + Math.random() * 4);
+      G.nextBird = R.w * (5 + Math.random() * 7);
     }
     for (var bi = G.birds.length - 1; bi >= 0; bi--) {
       G.birds[bi].x -= sp * 0.22;
@@ -854,14 +892,14 @@
     }
 
     G.nextMid -= sp * 0.55;
-    if (G.nextMid <= 0) { addMid(R.w + 40); G.nextMid = R.w * (0.22 + Math.random() * 0.5); }
+    if (G.nextMid <= 0) { addMid(R.w + 40); G.nextMid = R.w * (0.55 + Math.random() * 0.9); }
     for (var mi = G.mid.length - 1; mi >= 0; mi--) {
       G.mid[mi].x -= sp * 0.55;
       if (G.mid[mi].x < -R.w * 0.4) G.mid.splice(mi, 1);
     }
 
     G.nextFore -= sp * 1.18;
-    if (G.nextFore <= 0) { addFore(R.w + 30); G.nextFore = R.w * (0.08 + Math.random() * 0.22); }
+    if (G.nextFore <= 0) { addFore(R.w + 30); G.nextFore = R.w * (0.2 + Math.random() * 0.45); }
     for (var fi = G.fore.length - 1; fi >= 0; fi--) {
       G.fore[fi].x -= sp * 1.18;
       if (G.fore[fi].x < -R.w * 0.3) G.fore.splice(fi, 1);
@@ -929,16 +967,16 @@
 
     // sky, dawn over the lake: pale blue lifting to warm at the horizon
     var sky = rx.createLinearGradient(0, 0, 0, hz);
-    sky.addColorStop(0, '#D6E3EC');
-    sky.addColorStop(0.62, '#EDE9DF');
-    sky.addColorStop(1, '#F6F1E6');
+    sky.addColorStop(0, '#CFDFEC');
+    sky.addColorStop(0.7, '#E8EAE4');
+    sky.addColorStop(1, '#F2EFE4');
     rx.fillStyle = sky;
     rx.fillRect(0, 0, R.w, hz);
-    // scrubland between the horizon and the path
-    rx.fillStyle = '#E9E2D2';
+    // the near shore path, kept plain so the run reads clearly across it
+    rx.fillStyle = '#EDE8DA';
     rx.fillRect(0, hz, R.w, R.ground - hz);
 
-    drawBG('sun_02', R.w * 0.60, R.h * 0.13, R.h * 0.10, false, 0.7);
+    drawBG('sun_02', R.w * 0.87, R.h * 0.11, R.h * 0.09, false, 0.7);
 
     for (var ci = 0; ci < G.clouds.length; ci++) {
       var cl = G.clouds[ci];
@@ -949,11 +987,11 @@
       drawBG(bd.k, bd.x + pan * 0.22, bd.y, bd.h, false, 0.5);
     }
 
-    // Fuji and the far shore, then the town, then the treeline
-    tileBG('mountain_lake_backdrop', G.sky.backdrop - pan * 0.04, hz + R.h * 0.012, R.h * 0.62, 0.95, true);
-    tileBG('town_skyline',           G.sky.town     - pan * 0.16, hz + R.h * 0.028, R.h * 0.055, 0.85, true);
-    tileBG('autumn_forest_row',      G.sky.forest   - pan * 0.28, hz + R.h * 0.062, R.h * 0.075, 0.9, true);
-    tileBG('shore_strip_01',         G.sky.shore    - pan * 0.42, hz + R.h * 0.105, R.h * 0.05, 0.9, true);
+    // Fuji, the hills, the town and the lake all come in one piece, then a
+    // single treeline standing on the near shore. Two bands, not six.
+    tileSeamless('mountain_lake_backdrop', G.sky.backdrop - pan * 0.04, hz + R.h * 0.01, R.h * 0.62);
+    // the treeline stands on the far side of the path, not on it
+    tileSeamless('autumn_forest_row', G.sky.forest - pan * 0.26, hz + R.h * 0.018, R.h * 0.105);
 
     // scrub between the horizon and the path
     for (var mi = 0; mi < G.mid.length; mi++) {
@@ -961,17 +999,11 @@
       drawBG(m.k, m.x + pan * 0.55, hz + m.drop, m.h, m.flip, m.a);
     }
 
-    // the path underfoot, on an earth fill so tile joins never show through
-    rx.fillStyle = '#7A5B37';
+    // Grass over earth in one strip, mirrored tile on tile so the joins fall
+    // on matching columns and the grass never shows a break.
+    rx.fillStyle = '#6E8C43';
     rx.fillRect(0, R.ground, R.w, R.h - R.ground);
-    tileBG(G.groundKey, G.sky.ground - pan, R.h + 2, R.h - R.ground + 2, 1, true);
-    rx.strokeStyle = WALL;
-    rx.lineWidth = Math.max(1.5, R.h * 0.0045);
-    rx.lineCap = 'round';
-    rx.beginPath();
-    rx.moveTo(0, R.ground);
-    rx.lineTo(R.w, R.ground);
-    rx.stroke();
+    tileSeamless(G.groundKey, G.sky.ground - pan, R.h, R.h - R.ground);
 
     // weeds and stones nearest the eye, below the path so they cannot be
     // mistaken for something to jump
