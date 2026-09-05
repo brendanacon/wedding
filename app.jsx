@@ -551,9 +551,8 @@ function Attire() {
           <div style={cardStyle}>
             <div className="serif" style={headingStyle}>For the men</div>
             <p style={bodyStyle}>
-              A suit, or a blazer and trousers. Navy, charcoal, black and
-              everything in between all work perfectly. Please leave jeans,
-              chinos and sneakers behind.
+              A suit, or a blazer and trousers. Navy, charcoal and black all
+              work perfectly. Please leave jeans, chinos and sneakers behind.
             </p>
           </div>
         </div>
