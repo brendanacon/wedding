@@ -197,27 +197,26 @@
 <body>
   <div class="wrap">
     <div class="eyebrow fade" id="eyebrow">a little detour</div>
-    <h1 class="fade" id="title">Find each other</h1>
+    <h1 class="fade" id="title">Run to her</h1>
     <div class="rule"></div>
     <p class="lede fade" id="lede">
-      Erika is at one end and Brendan is at the other.
-      Draw the line that brings them together.
+      Erika is waiting at a hundred. Get Brendan over everything in the way.
     </p>
 
     <div class="board">
       <div class="stage" id="stage">
         <div class="track" id="track">
           <div class="panel">
-            <canvas id="maze" tabindex="0" aria-label="Maze puzzle: draw a path from Erika to Brendan"></canvas>
+            <canvas id="run" tabindex="0" aria-label="Running game: jump Brendan over obstacles to reach Erika"></canvas>
           </div>
           <div class="panel">
-            <canvas id="run" tabindex="0" aria-label="Running game: jump Brendan over obstacles to reach Erika"></canvas>
+            <canvas id="maze" tabindex="0" aria-label="Maze puzzle: draw a path from Erika to Brendan"></canvas>
           </div>
         </div>
       </div>
     </div>
 
-    <p class="hint fade" id="hint">Drag from <b>E</b> to <b>B</b><span class="kb"> &nbsp;·&nbsp; arrow keys work too</span></p>
+    <p class="hint fade" id="hint">Tap, or press space, to start</p>
 
     <div class="win" id="win">
       <div class="line" id="winLine">you found each other</div>
@@ -227,14 +226,14 @@
     <div class="over" id="over"><span id="overText"></span></div>
 
     <div class="controls">
-      <span class="grp" id="mazeControls">
+      <span class="grp" id="runControls">
+        <button id="restartBtn">Run again</button>
+        <button id="backBtn">Try the maze</button>
+      </span>
+      <span class="grp" id="mazeControls" hidden>
         <button id="newBtn">New maze</button>
         <button id="clearBtn">Clear the line</button>
-        <button id="nextBtn">Next game</button>
-      </span>
-      <span class="grp" id="runControls" hidden>
-        <button id="restartBtn">Run again</button>
-        <button id="backBtn">Back to the maze</button>
+        <button id="nextBtn">Back to the run</button>
       </span>
       <button id="expandBtn">Full screen</button>
     </div>
@@ -261,7 +260,7 @@
   var stage = document.getElementById('stage');
 
   var cols, rows, cell, cells, path, dragging, won, startedAt, elapsed;
-  var current = 'maze';
+  var current = 'run';
 
   // ── Maze generation (recursive backtracker → a perfect maze,
   //    so exactly one route joins any two cells) ───────────────
@@ -316,7 +315,7 @@
   function layout() {
     var portrait = window.innerWidth < 620;
     cols = portrait ? 11 : 17;
-    rows = portrait ? 15 : 12;
+    rows = portrait ? 8 : 12;   // keeps the frame's shape near the desktop's
 
     var big = document.body.classList.contains('expanded');
     var board = canvas.closest('.board');
@@ -760,26 +759,32 @@
     R.w = w; R.h = h; R.dpr = dpr;
     tileCache.clear();
     R.ground = h * 0.82;
-    R.figH = Math.round(h * 0.26);
+    // Everything about the run derives from this one unit, and the unit comes
+    // from the width. Sizing obstacles off the height while speed came off the
+    // width made a phone's tall frame nearly unplayable: a jump covered 104px
+    // against an 88px obstacle, leaving 31ms to time it against 329ms on a
+    // desktop. Off a single unit, every device gets the same game.
+    R.figH = Math.max(24, Math.round(w * 0.18));
     if (G) { G.y = Math.min(G.y, 0); drawRun(); }
   }
 
   function newGame() {
     G = {
-      phase: 'run',            // run → meet → won | over
+      phase: 'ready',          // ready → run → meet → won | over
       x: R.w * 0.16,
       y: 0,                    // height above ground (positive = airborne)
       vy: 0,
-      speed: R.w * 0.0072,
+      speed: R.figH * 0.04,
       score: 0,
       t: 0,                    // bob/idle phase
       stride: 0,               // run-cycle position, driven by distance
       obstacles: [],
       pebbles: [],
-      nextGap: R.w * 0.55,
+      nextGap: R.figH * 3,
       since: 0,
       erikaX: null,
       hug: 0,
+      paused: false,
       sky: { backdrop: 0, town: 0, forest: 0, shore: 0, ground: 0 },
       clouds: [], birds: [], mid: [], fore: [],
       nextMid: 0, nextFore: 0, nextBird: 0,
@@ -836,16 +841,30 @@
 
   var GRAV, JUMPV;
   function tuneJump() {
-    GRAV  = R.h * 0.0016;
+    GRAV  = R.figH * 0.00617;
     // Airtime, not height, is what makes this fair: it has to stay long enough
     // that landing clears an obstacle's trailing edge, which leaves roughly a
     // third of a second to time each jump.
-    JUMPV = R.h * 0.035;
+    JUMPV = R.figH * 0.135;
   }
 
   function jump() {
     if (!G) return;
     if (G.phase === 'over') { newGame(); loop(); return; }
+    // the run waits on the first press, so nobody arrives mid-stride
+    if (G.paused) {                       // resume after a resize
+      G.paused = false;
+      setHint(COPY.run.hint);
+      if (!raf) loop();
+      return;
+    }
+    if (G.phase === 'ready') {
+      G.phase = 'run';
+      setHint(COPY.run.hint);
+      G.vy = JUMPV;
+      if (!raf) loop();
+      return;
+    }
     if (G.phase !== 'run' && G.phase !== 'meet') return;
     if (G.y <= 0.01) { G.vy = JUMPV; }
   }
@@ -862,7 +881,8 @@
   }
 
   function tick(dt) {
-    if (G.phase === 'over' || G.phase === 'won') return;
+    if (G.phase === 'over' || G.phase === 'won' || G.paused) return;
+    var idling = G.phase === 'ready';
 
     G.t += dt * 0.32;
     // one full 6-frame cycle per two strides of ground covered
@@ -916,9 +936,9 @@
       if (G.fore[fi].x < -R.w * 0.3) G.fore.splice(fi, 1);
     }
 
-    if (G.phase === 'run') {
-      G.score += (G.speed * dt) / (R.w * 0.0755);
-      G.speed += R.w * 0.0000045 * dt;         // a gentle build
+    if (!idling && G.phase === 'run') {
+      G.score += (G.speed * dt) / (R.figH * 0.42);
+      G.speed += R.figH * 0.000025 * dt;         // a gentle build
 
       G.since += G.speed * dt;
       if (G.since > G.nextGap) {
@@ -936,6 +956,8 @@
         G.obstacles = G.obstacles.filter(function (o) { return o.x < G.x; });
       }
     }
+
+    if (idling) return;    // scenery drifts, but nothing to clear yet
 
     // move obstacles, test collision
     for (var j = G.obstacles.length - 1; j >= 0; j--) {
@@ -1062,12 +1084,14 @@
   }
 
   function drawScore() {
+    if (G.phase === 'ready') return;
     rx.fillStyle = SOFT;
     rx.font = '500 ' + Math.round(R.h * 0.032) + "px 'Jost', sans-serif";
-    rx.textAlign = 'right';
+    // left, so it never sits under the sun on a narrow frame
+    rx.textAlign = 'left';
     rx.textBaseline = 'top';
     var s = Math.floor(G.score);
-    rx.fillText(s + ' / 100', R.w - R.h * 0.035, R.h * 0.035);
+    rx.fillText(s + ' / 100', R.h * 0.035, R.h * 0.035);
   }
 
   function showWon() {
@@ -1104,7 +1128,7 @@
     lastT = now;
     tick(dt);
     drawRun();
-    if (G && (G.phase === 'run' || G.phase === 'meet')) {
+    if (G && !G.paused && (G.phase === 'ready' || G.phase === 'run' || G.phase === 'meet')) {
       raf = requestAnimationFrame(frame);
     } else {
       raf = null;
@@ -1130,18 +1154,22 @@
   // ── Swapping between the two ──────────────────────────────
   var COPY = {
     maze: {
-      eyebrow: 'a little detour',
+      eyebrow: 'one more thing',
       title: 'Find each other',
       lede: 'Erika is at one end and Brendan is at the other. Draw the line that brings them together.',
       hint: 'Drag from <b>E</b> to <b>B</b><span class="kb"> &nbsp;·&nbsp; arrow keys work too</span>'
     },
     run: {
-      eyebrow: 'one more thing',
+      eyebrow: 'a little detour',
       title: 'Run to her',
       lede: 'Erika is waiting at a hundred. Get Brendan over everything in the way.',
       hint: 'Tap, or press space, to jump'
     }
   };
+
+  function setHint(html) {
+    document.getElementById('hint').innerHTML = html;
+  }
 
   function setCopy(which) {
     var els = [document.getElementById('eyebrow'), document.getElementById('title'),
@@ -1162,21 +1190,18 @@
     winEl.classList.remove('show');
     overEl.classList.remove('show');
     setCopy(which);
-    track.style.transform = which === 'run' ? 'translateX(-50%)' : 'translateX(0)';
-    document.getElementById('mazeControls').hidden = (which === 'run');
-    document.getElementById('runControls').hidden = (which !== 'run');
+    track.style.transform = which === 'maze' ? 'translateX(-50%)' : 'translateX(0)';
+    document.getElementById('mazeControls').hidden = (which !== 'maze');
+    document.getElementById('runControls').hidden = (which === 'maze');
 
     if (which === 'run') {
       tuneJump();
+      setHint('Tap, or press space, to start');
       if (artReady) {
         newGame();
         setTimeout(function () { rc.focus(); loop(); }, 650);
       } else {
-        loadArt(function () {
-          newGame();
-          rc.focus();
-          loop();
-        });
+        loadArt(function () { newGame(); rc.focus(); loop(); });
       }
     } else {
       stopLoop();
@@ -1192,6 +1217,7 @@
     winEl.classList.remove('show');
     overEl.classList.remove('show');
     newGame();
+    setHint('Tap, or press space, to start');
     rc.focus();
     loop();
   });
@@ -1206,24 +1232,38 @@
     if (cols !== prevCols || rows !== prevRows) { generate(); clearLine(); }
     else draw();
     if (G) {
+      // One factor for everything. Heights once scaled by the figure ratio
+      // and gaps by the width ratio; rounding made those differ by a fraction
+      // of a percent, which was enough to turn a marginal mid-air jump into a
+      // collision.
       var fs = oldFigH ? R.figH / oldFigH : 1;
-      var ws = oldW ? R.w / oldW : 1;
       var oldX = G.x;
       G.x = R.w * 0.16;
       // Gaps have to scale about Brendan, not about the origin: scaling from
       // zero drags anything just behind him back on top of him.
       G.y *= fs; G.vy *= fs;
-      G.speed *= ws; G.nextGap *= ws; G.since *= ws;
-      if (G.erikaX !== null) G.erikaX = G.x + (G.erikaX - oldX) * ws;
-      if (G.pan) G.pan *= ws;
+      G.speed *= fs; G.nextGap *= fs; G.since *= fs;
+      if (G.erikaX !== null) G.erikaX = G.x + (G.erikaX - oldX) * fs;
+      if (G.pan) G.pan *= fs;
       G.obstacles.forEach(function (o) {
-        o.x = G.x + (o.x - oldX) * ws;
+        o.x = G.x + (o.x - oldX) * fs;
         o.w *= fs; o.h *= fs; o.cw *= fs;
       });
-      G.pebbles.forEach(function (pb) { pb.x = G.x + (pb.x - oldX) * ws; });
-      // he may have been mid-jump over something; at the new scale that
-      // straddle can register as a hit, so retire whatever he is over
-      G.obstacles = G.obstacles.filter(function (o) { return !overlapsX(o); });
+      G.pebbles.forEach(function (pb) { pb.x = G.x + (pb.x - oldX) * fs; });
+      // Clear anything he could not fairly react to on resuming: what he is
+      // standing over, and anything already inside jumping distance.
+      G.obstacles = G.obstacles.filter(function (o) {
+        if (overlapsX(o)) return false;
+        return (o.x + (o.w - o.cw) / 2) - G.x > R.figH * 1.3;
+      });
+      // Changing the size of the world under a run is disruptive however
+      // carefully it is rescaled, so hold the run still and let the player
+      // pick it back up when they are ready.
+      if (G.phase === 'run' || G.phase === 'meet') {
+        G.paused = true;
+        stopLoop();
+        setHint('Tap, or press space, to continue');
+      }
       drawRun();
     }
   }
@@ -1277,7 +1317,7 @@
   window.__runState = function () {
     if (!G) return null;
     return {
-      phase: G.phase, score: G.score, x: G.x, y: G.y,
+      phase: G.phase, score: G.score, x: G.x, y: G.y, paused: !!G.paused,
       ground: R.ground, figH: R.figH, w: R.w, speed: G.speed,
       obstacles: G.obstacles.map(function (o) {
         return { x: o.x, w: o.w, h: o.h, cw: o.cw };
@@ -1287,8 +1327,12 @@
 
   newMaze();
   tuneJump();
-  // the run needs its artwork before it can size anything, so load it up front
-  loadArt(function () { if (G) drawRun(); });
+  // the run is the game you land on, so bring it up as soon as the art is in
+  loadArt(function () {
+    tuneJump();
+    newGame();
+    loop();
+  });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(); drawRun(); });
 })();
 </script>
